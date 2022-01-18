@@ -1,0 +1,312 @@
+Sub generateAWListByDoubleClick()
+Application.ScreenUpdating = False
+'Application.Calculation = xlCalculationManual
+Application.EnableEvents = False
+Application.DisplayAlerts = False
+Worksheets("AWLtest").Visible = True
+
+count_partsname = Worksheets("DESIGN SPECIFICATIONS").Range("C8").End(xlDown).Row
+
+
+'Worksheets("AWLtest").Range("B5:S" & CStr((count_partsname * 8) + 10)).Clear
+Worksheets("AWLtest").Range("B5:S10000").Delete Shift:=xlUp
+Dim arrawnum As Variant
+Dim arrstr As Variant
+
+'set i=5 to indicate to start generating border from row 5 of AWL sheet
+i = 5
+bvalue = 5
+'loop from row 8(first awnum) to last cell of artwork new column where there is content filled in cell
+For k = 8 To Worksheets("DESIGN SPECIFICATIONS").Range("C2000").End(xlUp).Row
+
+
+    'get AW num of that row
+    awnum = Worksheets("DESIGN SPECIFICATIONS").Range("K" & CStr(k)).Value
+    'split the multiple AW num in a cell (separated by chr(13))
+    arrawnum = Split(awnum, Chr(13))
+    
+    'counts number of AW num (number of elements) in the cell
+    arrelements = UBound(arrawnum) - LBound(arrawnum) + 1
+    
+    'do this if cell has more than 1 AW num
+    If arrelements > 1 Then
+    
+        For j = 0 To arrelements - 1                'j to loop through all elements in the array
+            
+            'calls borderAWL function to generate the border for each entry
+            borderAWL8 (i)
+            
+            'fill in part name in the cell of AWL sheet (get from column C of design spec sheet)
+            Worksheets("AWLtest").Cells(i, 2).Value = UCase(Worksheets("DESIGN SPECIFICATIONS").Range("C" & k).Value)
+            Worksheets("AWLtest").Cells(i, 2).VerticalAlignment = xlTop
+            Worksheets("AWLtest").Cells(i, 2).HorizontalAlignment = xlLeft
+            'get first element (first AW num) of the cell
+            arrstr = arrawnum(j)
+            Worksheets("AWLtest").Cells(i, 4).Value = arrstr & "-00"
+            
+            'set the usage column of AWL according to A,B,C,D,E
+            If Right(arrstr, 1) = "A" Then
+                Worksheets("AWLtest").Cells(i, 3).Value = "PRINT"
+    
+            ElseIf Right(arrstr, 1) = "B" Then
+                Worksheets("AWLtest").Cells(i, 3).Value = "STICKER"
+    
+            ElseIf Right(arrstr, 1) = "C" Then
+                Worksheets("AWLtest").Cells(i, 3).Value = "MOLD"
+    
+            ElseIf Right(arrstr, 1) = "D" Then
+                Worksheets("AWLtest").Cells(i, 3).Value = "STAMPING"
+        
+            ElseIf Right(arrstr, 1) = "E" Then
+                Worksheets("AWLtest").Cells(i, 3).Value = "LASER"
+            
+            End If
+            
+            'set the row height to a fixed value
+            Worksheets("AWLtest").Rows(CStr(i) & ":" & CStr(i + 7)).RowHeight = 18
+            'hide the last 4 rows of each entry to display only 4 rows instead of 8
+            Worksheets("AWLtest").Range(CStr(i + 4) & ":" & CStr(i + 7)).EntireRow.Hidden = True
+            'offset by x cells down to input the next new AWnum of another part name
+            i = i + 8
+
+        Next j
+    
+    'do this if num of AW num in a cell is 1
+    ElseIf arrelements = 1 Then                     'arrelements = 1
+        borderAWL8 (i)
+        
+        awnum2 = Worksheets("DESIGN SPECIFICATIONS").Range("K" & CStr(k)).Value
+        Worksheets("AWLtest").Cells(i, 2).Value = UCase(Worksheets("DESIGN SPECIFICATIONS").Range("C" & k).Value)
+        Worksheets("AWLtest").Cells(i, 2).VerticalAlignment = xlTop
+        Worksheets("AWLtest").Cells(i, 2).HorizontalAlignment = xlLeft
+        If Right(awnum2, 1) = "A" Then
+            Worksheets("AWLtest").Cells(i, 3).Value = "PRINT"
+
+        ElseIf Right(awnum2, 1) = "B" Then
+            Worksheets("AWLtest").Cells(i, 3).Value = "STICKER"
+
+        ElseIf Right(awnum2, 1) = "C" Then
+            Worksheets("AWLtest").Cells(i, 3).Value = "MOLD"
+
+        ElseIf Right(awnum2, 1) = "D" Then
+            Worksheets("AWLtest").Cells(i, 3).Value = "STAMPING"
+
+        ElseIf Right(awnum2, 1) = "E" Then
+            Worksheets("AWLtest").Cells(i, 3).Value = "LASER"
+        End If
+
+        Worksheets("AWLtest").Cells(i, 4).Value = awnum2 & "-00"
+    'set the row height to a fixed value
+    Worksheets("AWLtest").Rows(CStr(i) & ":" & CStr(i + 7)).RowHeight = 18
+    'hide the last 4 rows of each entry to display only 4 rows instead of 8
+    Worksheets("AWLtest").Range(CStr(i + 4) & ":" & CStr(i + 7)).EntireRow.Hidden = True
+    i = i + 8
+
+
+    End If
+    
+    '------------------------------------common aw num-----------------------------------------------
+    'get AW num of that row
+    awnumL = Worksheets("DESIGN SPECIFICATIONS").Range("L" & CStr(k)).Value
+    'split the multiple AW num in a cell (separated by chr(13))
+    arrawnumL = Split(awnumL, Chr(10))
+    
+    'counts number of AW num (number of elements) in the cell
+    arrelementsL = UBound(arrawnumL) - LBound(arrawnumL) + 1
+    'Debug.Print ("num_elementsL:" & CStr(arrelementsL))
+    'do this if cell has more than 1 AW num
+    If arrelementsL > 1 Then
+    
+        For j = 0 To arrelementsL - 1                'j to loop through all elements in the array
+            
+            'calls borderAWL function to generate the border for each entry
+            borderAWL8 (i)
+            
+            'fill in part name in the cell of AWL sheet (get from column C of design spec sheet)
+            Worksheets("AWLtest").Cells(i, 2).Value = UCase(Worksheets("DESIGN SPECIFICATIONS").Range("C" & k).Value)
+            Worksheets("AWLtest").Cells(i, 2).VerticalAlignment = xlTop
+            Worksheets("AWLtest").Cells(i, 2).HorizontalAlignment = xlLeft
+            'get first element (first AW num) of the cell
+            arrstr = arrawnumL(j)
+            Worksheets("AWLtest").Cells(i, 4).Value = arrstr & "-00"
+            
+            'set the usage column of AWL according to A,B,C,D,E
+            If Right(arrstr, 1) = "A" Then
+                Worksheets("AWLtest").Cells(i, 3).Value = "PRINT"
+    
+            ElseIf Right(arrstr, 1) = "B" Then
+                Worksheets("AWLtest").Cells(i, 3).Value = "STICKER"
+    
+            ElseIf Right(arrstr, 1) = "C" Then
+                Worksheets("AWLtest").Cells(i, 3).Value = "MOLD"
+    
+            ElseIf Right(arrstr, 1) = "D" Then
+                Worksheets("AWLtest").Cells(i, 3).Value = "STAMPING"
+        
+            ElseIf Right(arrstr, 1) = "E" Then
+                Worksheets("AWLtest").Cells(i, 3).Value = "LASER"
+            
+            End If
+            
+            'set the row height to a fixed value
+            Worksheets("AWLtest").Rows(CStr(i) & ":" & CStr(i + 7)).RowHeight = 18
+            'hide the last 4 rows of each entry to display only 4 rows instead of 8
+            Worksheets("AWLtest").Range(CStr(i + 4) & ":" & CStr(i + 7)).EntireRow.Hidden = True
+            'offset by x cells down to input the next new AWnum of another part name
+            i = i + 8
+
+        Next j
+    
+    'do this if num of AW num in a cell is 1
+    ElseIf arrelementsL = 1 Then                     'arrelements = 1
+        borderAWL8 (i)
+        
+        awnum2 = Worksheets("DESIGN SPECIFICATIONS").Range("L" & CStr(k)).Value
+        Worksheets("AWLtest").Cells(i, 2).Value = UCase(Worksheets("DESIGN SPECIFICATIONS").Range("C" & k).Value)
+        Worksheets("AWLtest").Cells(i, 2).VerticalAlignment = xlTop
+        Worksheets("AWLtest").Cells(i, 2).HorizontalAlignment = xlLeft
+        If Right(awnum2, 1) = "A" Then
+            Worksheets("AWLtest").Cells(i, 3).Value = "PRINT"
+
+        ElseIf Right(awnum2, 1) = "B" Then
+            Worksheets("AWLtest").Cells(i, 3).Value = "STICKER"
+
+        ElseIf Right(awnum2, 1) = "C" Then
+            Worksheets("AWLtest").Cells(i, 3).Value = "MOLD"
+
+        ElseIf Right(awnum2, 1) = "D" Then
+            Worksheets("AWLtest").Cells(i, 3).Value = "STAMPING"
+
+        ElseIf Right(awnum2, 1) = "E" Then
+            Worksheets("AWLtest").Cells(i, 3).Value = "LASER"
+        End If
+
+        Worksheets("AWLtest").Cells(i, 4).Value = awnum2 & "-00"
+
+    'set the row height to a fixed value
+    Worksheets("AWLtest").Rows(CStr(i) & ":" & CStr(i + 7)).RowHeight = 18
+    'hide the last 4 rows of each entry to display only 4 rows instead of 8
+    Worksheets("AWLtest").Range(CStr(i + 4) & ":" & CStr(i + 7)).EntireRow.Hidden = True
+    i = i + 8
+
+
+    End If
+    
+'    totalawnum = (arrelements + arrelementsL)
+'    'Debug.Print "totalawnum"; totalawnum
+'    rowsmerged = (totalawnum * 8) - 1
+'    'Debug.Print "rowsmerged"; rowsmerged
+'
+'    Call mergepn(bvalue, rowsmerged)
+'    bvalue = bvalue + rowsmerged + 1
+'
+'    Application.DisplayAlerts = False
+    
+Next k
+
+'set row height of the list (excluding table below list) to a fixed value
+'Worksheets("AWLtest").Rows("1:" & CStr(i - 8)).RowHeight = 18
+awlfont
+    'copy the product name,page box and paste it below the genrated AW list table
+    Worksheets("AWLtest").Range("Y7:Y8").Copy
+    Worksheets("AWLtest").Range("B2000").End(xlUp).Offset(3, 0).PasteSpecial Paste:=xlPasteAll, Operation:=xlNone, SkipBlanks:= _
+    False, Transpose:=False
+
+
+    'Worksheets("AWLtest").Range("X12:AI14").Select
+    'Selection.Copy
+    'Worksheets("AWLtest").Range("G2000").End(xlUp).Offset(3, 0).Select
+    'ActiveSheet.Paste
+    With Sheets("AWLtest").Range("B:B")
+    Set bottomCell = .Find(what:="PRODUCT")
+    'bottomCell.EntireRow.Interior.Color = RGB(255, 255, 255)
+    Set offsetCell = bottomCell.Offset(0, 5)
+    'pull product name from concept design spec sheet
+    Set offsetProductNameCell = bottomCell.Offset(1, 0)
+    offsetProductNameCell.Value = Worksheets("DESIGN SPECIFICATIONS").Range("D4").Value
+    offsetProductNameCell.Font.Name = "Arial"
+    offsetProductNameCell.Font.Size = 14
+    
+    'adjust the format, size and fonts of the table below AWL
+    offsetProductNameCell.EntireRow.RowHeight = 33
+    offsetProductNameCell.Offset(1, 0).EntireRow.RowHeight = 33
+    'bottomCell.Offset(2, 11).Font.Name = "Arial"
+    'bottomCell.Offset(2, 11).Font.Size = 12
+    End With
+    
+
+Worksheets("AWLtest").Range("X12:AI14").Copy
+offsetCell.PasteSpecial Paste:=xlPasteAll, Operation:=xlNone, SkipBlanks:= _
+False, Transpose:=False
+
+    'generate 'drawn by' and 'Code No.' cell inputs
+     With Sheets("AWLtest").Range("B:B")
+     Set bottomCell = .Find(what:="PRODUCT")
+     'pull drawnby name from concept design spec sheet
+    Set offsetDrawnByCell = bottomCell.Offset(1, 11)
+    offsetDrawnByCell.Value = Worksheets("DESIGN SPECIFICATIONS").Range("O4").Value
+    'pull approval name from concept design spec sheet
+    Set offsetApprovalCell = bottomCell.Offset(1, 9)
+    offsetApprovalCell.Value = Sheets("DESIGN SPECIFICATIONS").Range("T3").Value
+    'generate code number with latest version
+    Set offsetCodeNoCell = bottomCell.Offset(2, 11)
+    offsetCodeNoCell.Value = "AW-" & CStr(offsetProductNameCell.Value) & "-00"
+    offsetCodeNoCell.Font.Size = 12
+    
+    'unhide the rows hidden so table below AWL list is not partially hidden
+    row_num_product_name = bottomCell.Row
+    'Debug.Print ("rownumprodname:" & CStr(row_num_product_name))
+    Worksheets("AWLtest").Range(CStr(row_num_product_name) & ":" & CStr(row_num_product_name + 2)).EntireRow.Hidden = False
+    End With
+
+'----remove the enter line of spaces with no spaces for each cell under code no. column (in case user inserts a space when filling in new AW num in concept design spec sheet.
+
+For s = 5 To Worksheets("AWLtest").Range("D2000").End(xlUp).Row
+    Worksheets("AWLtest").Range("D" & CStr(s)) = Replace(Worksheets("AWLtest").Range("D" & CStr(s)), Chr(10), "")
+Next s
+'-----------
+'to highlight entire row if aw num is in D
+Application.ScreenUpdating = True
+'Application.Calculation = xlCalculationAutomatic
+Application.EnableEvents = True
+
+'force certain random colour and text appearing glitches to correct state
+Worksheets("AWLtest").Range("D2").ClearContents
+Worksheets("AWLtest").Range("B1:S2").Interior.Color = xlNone
+bottomrow = Worksheets("AWLtest").Range("D1000").Offset(8, 0).Row
+Worksheets("AWLtest").Range("B" & CStr(bottomrow) & ":S" & CStr(bottomrow + 10)).Interior.Color = xlNone
+
+
+
+
+''protect the header cells
+'Worksheets("AWLtest").Unprotect
+'Worksheets("AWLtest").Cells.Locked = True
+'Worksheets("AWLtest").Range("B5:S" & Range("K2000").End(xlUp).Row).Locked = False
+'Worksheets("AWLtest").Range("A1:E1").Locked = False
+'Worksheets("AWLtest").Protect UserInterfaceOnly:=True
+
+'Merge part name cells of AWL
+'.Range("O:O").Find(what:="1")
+Application.EnableEvents = False
+
+With Sheets("AWLtest").Range("B:B")
+Set rowFind = .Find(what:="PRODUCT")
+'Debug.Print ("ROW FIND" & CStr(rowFind.Row))
+Set rowFind2 = rowFind.Offset(-10, 0)
+
+For a = 5 To rowFind2.Row Step 8
+    While Sheets("AWLtest").Range("B" & CStr(a)).Value = Sheets("AWLtest").Range("B" & CStr(a + 8)).Value
+        
+        Application.DisplayAlerts = False
+        Sheets("AWLtest").Range("B" & CStr(a) & ":B" & CStr(a + 8)).Select
+        Selection.Merge
+        a = a + 8
+        Application.DisplayAlerts = True
+    Wend
+    
+Next a
+Application.EnableEvents = True
+
+End With
+End Sub
