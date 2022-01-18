@@ -1,0 +1,493 @@
+Private Sub Worksheet_BeforeDoubleClick(ByVal Target As Range, Cancel As Boolean)
+
+End Sub
+
+
+
+Private Sub generateAW_A3_Click()
+'unhide sheets first when user clicks on button
+Sheets("DESIGN SPECIFICATIONS").Visible = True
+Sheets("A4 Template").Visible = True
+Sheets("A3 Template").Visible = True
+i = 29
+
+clearlinesA3
+
+'add the lines for AW template
+For r = 16 To 28 Step 3
+    If Not IsEmpty(Cells(r, 4).Value) Then
+        addlineA3 (i)
+              
+    End If
+    
+    i = i - 1
+Next r
+
+'copies a new blank AW template sheet
+Sheets("A3 Template").Copy After:=Sheets(Sheets.Count)
+m = 0
+    For Each s In ActiveWorkbook.Sheets
+    If s.Visible Then m = m + 1
+    Next s
+    
+    codenum = Range("D4").Value
+    
+    CDSawnum = Left(codenum, Len(codenum) - 3)
+    Debug.Print "CDSAWnum"; CDSawnum
+
+    Set awCell = Worksheets("DESIGN SPECIFICATIONS").Range("K:L").Find(what:=CDSawnum)
+    
+        If Not awCell Is Nothing Then
+            Debug.Print "awyes"
+            Debug.Print "awcell"; awCell
+            
+            firstadd = awCell.Address(False, False)
+            Debug.Print "firstadd "; firstadd
+            
+            If awCell.Column = 11 Then
+            sncell = Worksheets("DESIGN SPECIFICATIONS").Range(CStr(firstadd)).Offset(0, -9).Value
+            
+            ElseIf awCell.Column = 12 Then
+            sncell = Worksheets("DESIGN SPECIFICATIONS").Range(CStr(firstadd)).Offset(0, -10).Value
+            End If
+            
+        End If
+        
+    'Sheets(m).Name = Range("D4").Value & " " & "#" & sncell
+     Sheets(m).Name = Range("D4").Value & " " & "XXXXXX"
+    
+'delete the triangle for new AW and add content
+multoftwo = 12
+For t = 4 To 8 Step 1
+    rowACN = t + multoftwo
+    
+    If IsEmpty(Cells(rowACN, 4).Value) Then
+            
+        m = 0
+        For Each s In ActiveWorkbook.Sheets
+        If s.Visible Then m = m + 1
+        Next s
+        
+        Sheets(m).Select
+        Debug.Print "name"; Sheets(m).Name
+        Sheets(m).Shapes("Triangle" & CStr(t)).Select
+        Selection.Delete
+
+    End If
+        multoftwo = multoftwo + 2
+   Next t
+   
+f = 32
+For contentrow = 7 To 28 Step 3
+    If IsEmpty(Cells(contentrow, 4).Value) = False Then
+        Sheets(m).Range("P" & CStr(f)).Value = "                                  " & Cells(contentrow, 4).Value
+    End If
+    f = f - 1
+
+Next contentrow
+
+
+
+
+
+'------fills up table contents below the new A3 AW template sheet-------
+
+'product name
+Sheets(m).Range("S33").Value = Range("D2").Value
+Sheets(m).Range("S33").HorizontalAlignment = xlCenter
+Sheets(m).Range("S33").VerticalAlignment = xlCenter
+Sheets(m).Range("S33").Font.Name = "Arial"
+Sheets(m).Range("S33").Font.Size = 10
+'part name
+Sheets(m).Range("S34").Value = Range("D3").Value
+Sheets(m).Range("S34").HorizontalAlignment = xlCenter
+Sheets(m).Range("S34").VerticalAlignment = xlCenter
+Sheets(m).Range("S34").Font.Name = "Arial"
+Sheets(m).Range("S34").Font.Size = 10
+
+'code number
+Sheets(m).Range("S35").Value = Range("D4").Value
+Sheets(m).Range("S35").HorizontalAlignment = xlCenter
+Sheets(m).Range("S35").VerticalAlignment = xlCenter
+Sheets(m).Range("S35").Font.Name = "Arial"
+Sheets(m).Range("S35").Font.Size = 10
+
+'Date
+Sheets(m).Range("Q35").Value = Range("D5").Value
+Sheets(m).Range("Q35").HorizontalAlignment = xlCenter
+Sheets(m).Range("Q35").VerticalAlignment = xlCenter
+Sheets(m).Range("Q35").NumberFormat = "yyyy.mm.dd"
+Sheets(m).Range("Q35").Font.Name = "Arial"
+Sheets(m).Range("Q35").Font.Size = 10
+
+'designed by
+Sheets(m).Range("Q34").Value = Sheets("DESIGN SPECIFICATIONS").Range("O2").Value
+Sheets(m).Range("Q34").HorizontalAlignment = xlCenter
+Sheets(m).Range("Q34").VerticalAlignment = xlCenter
+Sheets(m).Range("Q34").Font.Name = "Arial"
+Sheets(m).Range("Q34").Font.Size = 10
+
+''checked by
+'Sheets(m).Range("O34").Value = Sheets("DESIGN SPECIFICATIONS").Range("S3").Value
+'Sheets(m).Range("O34").HorizontalAlignment = xlCenter
+'Sheets(m).Range("O34").VerticalAlignment = xlCenter
+'Sheets(m).Range("O34").Font.Name = "Arial"
+'Sheets(m).Range("O34").Font.Size = 10
+
+'highlight cells to fill in grey
+Sheets(m).Range("M33:M35").Interior.Color = RGB(217, 217, 217)
+Sheets(m).Range("O34:O35").Interior.Color = RGB(217, 217, 217)
+Sheets(m).Range("Q33").Interior.Color = RGB(217, 217, 217)
+
+
+'Application:print/sticker/engrave/stamping/laser
+length_code_number = Len(Range("D4"))
+
+If Mid(Range("D4"), length_code_number - 3, 1) = "A" Then
+    Sheets(m).Range("O33").Value = "PRINT"
+
+
+ElseIf Mid(Range("D4"), length_code_number - 3, 1) = "B" Then
+    Sheets(m).Range("O33").Value = "STICKER"
+
+ElseIf Mid(Range("D4"), length_code_number - 3, 1) = "C" Then
+    Sheets(m).Range("O33").Value = "MOLD"
+
+ElseIf Mid(Range("D4"), length_code_number - 3, 1) = "D" Then
+    Sheets(m).Range("O33").Value = "STAMPING"
+
+Else
+    'when letter = "E"
+    Sheets(m).Range("O33").Value = "LASER"
+
+End If
+
+Sheets(m).Range("O33").HorizontalAlignment = xlCenter
+Sheets(m).Range("O33").VerticalAlignment = xlCenter
+Sheets(m).Range("O33").Font.Name = "Arial"
+Sheets(m).Range("O33").Font.Size = 10
+
+'hide the rest of the copied workbooks so that only ACN shows
+Sheets("DESIGN SPECIFICATIONS").Visible = False
+Sheets("A4 Template").Visible = False
+Sheets("A3 Template").Visible = False
+'For a = 1 To 8
+'With Sheets("A4 Template")
+'         .Shapes("Triangle" & CStr(a)).Visible = True
+'End With
+'Next a
+
+
+'    CDSawnum = Left(awnum00, Len(awnum00) - 3)
+'    Debug.Print "CDSAWnum"; CDSawnum
+'
+'    Set awCell = Worksheets("DESIGN SPECIFICATIONS").Range("K:L").Find(what:=CDSawnum)
+'
+'        If Not awCell Is Nothing Then
+'            Debug.Print "awyes"
+'            Debug.Print "awcell"; awCell
+'
+'            firstadd = awCell.Address(False, False)
+'            Debug.Print "firstadd "; firstadd
+'
+'            If awCell.Column = 11 Then
+'            sncell = Worksheets("DESIGN SPECIFICATIONS").Range(CStr(firstadd)).Offset(0, -9).Value
+'
+'            ElseIf awCell.Column = 12 Then
+'            sncell = Worksheets("DESIGN SPECIFICATIONS").Range(CStr(firstadd)).Offset(0, -10).Value
+'            End If
+'
+'        End If
+'
+'    Sheets(m).Name = awnum00 & "-" & "#" & sncell
+    
+    'save file as pdf
+    fileSaveName = Application.GetSaveAsFilename(InitialFileName:=Sheets(m).Name, _
+    FileFilter:="PDF Files (*.pdf), *.pdf")
+    If fileSaveName <> False Then
+    ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, _
+    Filename:=fileSaveName, _
+    Quality:=xlQualityStandard, _
+    IncludeDocProperties:=True, _
+    IgnorePrintAreas:=False, _
+    OpenAfterPublish:=True
+    End If
+    
+    Application.DisplayAlerts = False
+    Sheets(m).Delete
+    Application.DisplayAlerts = True
+
+End Sub
+
+Sub generateAW_A4_Click()
+
+'unhide sheets first when user clicks on button
+'Sheets(Array("DESIGN SPECIFICATIONS", "A4 Template", "A3 Template")).Visible = xlSheetVisible
+Sheets("DESIGN SPECIFICATIONS").Visible = True
+Sheets("A4 Template").Visible = True
+Sheets("A3 Template").Visible = True
+i = 11
+
+clearlinesA4
+
+'add the lines for AW template
+For r = 16 To 28 Step 3
+    If Not IsEmpty(Cells(r, 4).Value) Then
+        addlineA4 (i)
+              
+    End If
+    
+    i = i - 1
+Next r
+
+'copies a new blank AW template sheet
+Sheets("A4 Template").Copy After:=Sheets(Sheets.Count)
+    m = 0
+    
+    For Each s In ActiveWorkbook.Sheets
+    If s.Visible Then m = m + 1
+    Next s
+    
+    codenum = Range("D4").Value
+    
+    CDSawnum = Left(codenum, Len(codenum) - 3)
+    Debug.Print "CDSAWnum"; CDSawnum
+
+    Set awCell = Worksheets("DESIGN SPECIFICATIONS").Range("K:L").Find(what:=CDSawnum)
+    
+        If Not awCell Is Nothing Then
+            Debug.Print "awyes"
+            Debug.Print "awcell"; awCell
+            
+            firstadd = awCell.Address(False, False)
+            Debug.Print "firstadd "; firstadd
+            
+            If awCell.Column = 11 Then
+            sncell = Worksheets("DESIGN SPECIFICATIONS").Range(CStr(firstadd)).Offset(0, -9).Value
+            
+            ElseIf awCell.Column = 12 Then
+            sncell = Worksheets("DESIGN SPECIFICATIONS").Range(CStr(firstadd)).Offset(0, -10).Value
+            End If
+            
+        End If
+        
+    'Sheets(m).Name = Range("D4").Value & " " & "#" & sncell
+      Sheets(m).Name = Range("D4").Value & " " & "XXXXXX"
+'delete the triangle for new AW and add content
+multoftwo = 12
+
+For t = 4 To 8 Step 1
+    rowACN = t + multoftwo
+    
+    If IsEmpty(Cells(rowACN, 4).Value) Then
+            
+        m = 0
+        For Each s In ActiveWorkbook.Sheets
+        If s.Visible Then m = m + 1
+        Next s
+        
+        Sheets(m).Select
+        Debug.Print "name"; Sheets(m).Name
+        Sheets(m).Shapes("Triangle" & CStr(t)).Select
+        Selection.Delete
+
+    End If
+    
+    multoftwo = multoftwo + 2
+Next t
+
+
+f = 14
+For contentrow = 7 To 28 Step 3
+    If IsEmpty(Cells(contentrow, 4).Value) = False Then
+        Sheets(m).Range("F" & CStr(f)).Value = "            " & Cells(contentrow, 4).Value
+    End If
+    f = f - 1
+Next contentrow
+
+
+'------fills up table contents below the new A4 AW template sheet-------
+
+'product name
+Sheets(m).Range("H15").Value = Range("D2").Value
+Sheets(m).Range("H15").HorizontalAlignment = xlCenter
+Sheets(m).Range("H15").VerticalAlignment = xlCenter
+Sheets(m).Range("H15").Font.Name = "Arial"
+Sheets(m).Range("H15").Font.Size = 10
+
+'part name
+Sheets(m).Range("H16").Value = Range("D3").Value
+Sheets(m).Range("H16").HorizontalAlignment = xlCenter
+Sheets(m).Range("H16").VerticalAlignment = xlCenter
+Sheets(m).Range("H16").Font.Name = "Arial"
+Sheets(m).Range("H16").Font.Size = 10
+'code number
+Sheets(m).Range("H17").Value = Range("D4").Value
+Sheets(m).Range("H17").HorizontalAlignment = xlCenter
+Sheets(m).Range("H17").VerticalAlignment = xlCenter
+Sheets(m).Range("H17").Font.Name = "Arial"
+Sheets(m).Range("H17").Font.Size = 10
+'Date
+Sheets(m).Range("F17").Value = Range("D5").Value
+Sheets(m).Range("F17").HorizontalAlignment = xlCenter
+Sheets(m).Range("F17").VerticalAlignment = xlCenter
+Sheets(m).Range("F17").NumberFormat = "yyyy.mm.dd"
+Sheets(m).Range("F17").Font.Name = "Arial"
+Sheets(m).Range("F17").Font.Size = 10
+'designed by
+Sheets(m).Range("F16").Value = Sheets("DESIGN SPECIFICATIONS").Range("O2").Value
+Sheets(m).Range("F16").HorizontalAlignment = xlCenter
+Sheets(m).Range("F16").VerticalAlignment = xlCenter
+Sheets(m).Range("F16").Font.Name = "Arial"
+Sheets(m).Range("F16").Font.Size = 10
+''checked by
+'Sheets(m).Range("D16").Value = Sheets("DESIGN SPECIFICATIONS").Range("S3").Value
+'Sheets(m).Range("D16").HorizontalAlignment = xlCenter
+'Sheets(m).Range("D16").VerticalAlignment = xlCenter
+'Sheets(m).Range("D16").Font.Name = "Arial"
+'Sheets(m).Range("D16").Font.Size = 10
+
+'highlight cells that user need to fill in grey
+Sheets(m).Range("B15:B17").Interior.Color = RGB(217, 217, 217)
+Sheets(m).Range("D16:D17").Interior.Color = RGB(217, 217, 217)
+Sheets(m).Range("F15").Interior.Color = RGB(217, 217, 217)
+
+'Application:print/sticker/engrave/stamping/laser
+length_code_number = Len(Range("D4"))
+
+If Mid(Range("D4"), length_code_number - 3, 1) = "A" Then
+    Sheets(m).Range("D15").Value = "PRINT"
+
+ElseIf Mid(Range("D4"), length_code_number - 3, 1) = "B" Then
+    Sheets(m).Range("D15").Value = "STICKER"
+
+ElseIf Mid(Range("D4"), length_code_number - 3, 1) = "C" Then
+    Sheets(m).Range("D15").Value = "MOLD"
+
+ElseIf Mid(Range("D4"), length_code_number - 3, 1) = "D" Then
+    Sheets(m).Range("D15").Value = "STAMPING"
+
+Else
+    'when letter = "E"
+    Sheets(m).Range("D15").Value = "LASER"
+
+End If
+
+Sheets(m).Range("D15").HorizontalAlignment = xlCenter
+Sheets(m).Range("D15").VerticalAlignment = xlCenter
+Sheets(m).Range("D15").Font.Name = "Arial"
+Sheets(m).Range("D15").Font.Size = 10
+
+'hide the rest of the copied workbooks so that only ACN shows
+Sheets("DESIGN SPECIFICATIONS").Visible = False
+Sheets("A4 Template").Visible = False
+Sheets("A3 Template").Visible = False
+
+    'save file as pdf
+    fileSaveName = Application.GetSaveAsFilename(InitialFileName:=Sheets(m).Name, _
+    FileFilter:="PDF Files (*.pdf), *.pdf")
+    If fileSaveName <> False Then
+    ActiveSheet.ExportAsFixedFormat Type:=xlTypePDF, _
+    Filename:=fileSaveName, _
+    Quality:=xlQualityStandard, _
+    IncludeDocProperties:=True, _
+    IgnorePrintAreas:=False, _
+    OpenAfterPublish:=True
+    End If
+    
+    Application.DisplayAlerts = False
+    Sheets(m).Delete
+    Application.DisplayAlerts = True
+
+End Sub
+
+Sub clearlinesA4()
+'
+' clearlines Macro
+'
+    
+    Worksheets("A4 template").Select
+    Worksheets("A4 Template").Range("F7:H11").Select
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    Selection.Borders(xlEdgeLeft).LineStyle = xlNone
+    Selection.Borders(xlEdgeTop).LineStyle = xlNone
+    Selection.Borders(xlEdgeBottom).LineStyle = xlNone
+    Selection.Borders(xlEdgeRight).LineStyle = xlNone
+    Selection.Borders(xlInsideVertical).LineStyle = xlNone
+    Selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+    Worksheets("A4 Template").Range("H6").Select
+    Selection.AutoFill Destination:=Worksheets("A4 Template").Range("H6:H11"), Type:=xlFillDefault
+    
+End Sub
+
+Sub clearlinesA3()
+'
+' clearlines Macro
+'
+    
+    Worksheets("A3 template").Select
+    Worksheets("A3 Template").Range("P25:S29").Select
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    Selection.Borders(xlEdgeLeft).LineStyle = xlNone
+    Selection.Borders(xlEdgeTop).LineStyle = xlNone
+    Selection.Borders(xlEdgeBottom).LineStyle = xlNone
+    Selection.Borders(xlEdgeRight).LineStyle = xlNone
+    Selection.Borders(xlInsideVertical).LineStyle = xlNone
+    Selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+    Worksheets("A3 Template").Range("S24").Select
+    Selection.AutoFill Destination:=Worksheets("A3 Template").Range("S24:S29"), Type:=xlFillDefault
+
+End Sub
+
+Function addlineA4(i)
+
+    
+    Sheets("A4 Template").Range("F" & CStr(i) & ":H" & CStr(i)).Select
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    Selection.Borders(xlEdgeLeft).LineStyle = xlNone
+    Selection.Borders(xlEdgeTop).LineStyle = xlNone
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeRight)
+       .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlMedium
+    End With
+    Selection.Borders(xlInsideVertical).LineStyle = xlNone
+    Selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+
+End Function
+
+Function addlineA3(i)
+    
+    
+    Sheets("A3 Template").Range("P" & CStr(i) & ":S" & CStr(i)).Select
+    Selection.Borders(xlDiagonalDown).LineStyle = xlNone
+    Selection.Borders(xlDiagonalUp).LineStyle = xlNone
+    Selection.Borders(xlEdgeLeft).LineStyle = xlNone
+    Selection.Borders(xlEdgeTop).LineStyle = xlNone
+    With Selection.Borders(xlEdgeBottom)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlThin
+    End With
+    With Selection.Borders(xlEdgeRight)
+        .LineStyle = xlContinuous
+        .ColorIndex = 0
+        .TintAndShade = 0
+        .Weight = xlMedium
+    End With
+    Selection.Borders(xlInsideVertical).LineStyle = xlNone
+    Selection.Borders(xlInsideHorizontal).LineStyle = xlNone
+
+End Function
+
