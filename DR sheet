@@ -1,0 +1,536 @@
+
+Private Sub cdsbuttton_Click()
+
+ActiveWorkbook.Save
+Dim wb As Workbook
+Dim wbnew As Workbook
+Dim Sh As Worksheet
+Dim shnew As Worksheet
+
+
+
+
+Set ssf = Sheets("DR").Range("F:I").Find(what:="SSF")
+ssfrow = ssf.Row
+endrange = ssfrow - 1
+lastdsrow = Range("F13:H" & CStr(endrange)).Find("*", , xlValues, , xlByRows, xlPrevious).Row
+designtype = Sheets("DR").Cells(lastdsrow, 6).Value
+shortform = Left(designtype, 2)
+                
+If shortform = "DS" Then
+    ActiveWorkbook.Save
+    'Sheets(Array("DR", "DESIGN SPECIFICATIONS")).Select
+    'Sheets("DESIGN SPECIFICATIONS").Activate
+    'Sheets(Array("DR", "DESIGN SPECIFICATIONS")).Copy
+    
+    
+    If Cells(lastdsrow, 9).Value = "00" Then
+    titlecds = Cells(lastdsrow, 6).Value & Cells(lastdsrow, 7).Value & Cells(lastdsrow, 8).Value & Cells(lastdsrow, 9).Value & " " & Sheets("DESIGN SPECIFICATIONS").Range("K2").Value
+    Else
+    titlecds = Cells(lastdsrow, 6).Value & Cells(lastdsrow, 7).Value & Cells(lastdsrow, 8).Value & "0" & Cells(lastdsrow, 9).Value & " " & Sheets("DESIGN SPECIFICATIONS").Range("K2").Value
+    End If
+    fileSaveName = Application.GetSaveAsFilename(InitialFileName:=titlecds, _
+    FileFilter:="Excel Macro Enabled Workbook (*.xlsm), *.xlsm)")
+    
+    If fileSaveName = False Then
+        Exit Sub
+    End If
+    
+    ActiveWorkbook.SaveAs Filename:=fileSaveName, FileFormat:=xlOpenXMLWorkbookMacroEnabled
+    ActiveWorkbook.Sheets("AWLtest").Visible = False
+    ActiveWorkbook.Sheets("ACN").Visible = False
+    ActiveWorkbook.Sheets("A4 Template").Visible = False
+    ActiveWorkbook.Sheets("A3 Template").Visible = False
+    ActiveWorkbook.Sheets("A4 Template 00").Visible = False
+    ActiveWorkbook.Sheets("A3 Template 00").Visible = False
+    ActiveWorkbook.Sheets("CONCEPT MODEL PHOTO").Visible = False
+    ActiveWorkbook.Save
+    'ActiveWorkbook.Close
+    
+ElseIf shortform = "SS" Then
+    ActiveWorkbook.Save
+    'Sheets(Array("DR", "DESIGN SPECIFICATIONS")).Select
+    'Sheets("DESIGN SPECIFICATIONS").Activate
+    'Sheets(Array("DR", "DESIGN SPECIFICATIONS")).Copy
+    
+    If Cells(lastdsrow, 9).Value = "00" Then
+    titlecds = Cells(lastdsrow, 6).Value & Cells(lastdsrow, 7).Value & Cells(lastdsrow, 9).Value & " " & Sheets("DESIGN SPECIFICATIONS").Range("K2").Value
+    Else
+    titlecds = Cells(lastdsrow, 6).Value & Cells(lastdsrow, 7).Value & "0" & Cells(lastdsrow, 9).Value & " " & Sheets("DESIGN SPECIFICATIONS").Range("K2").Value
+    End If
+    
+    fileSaveName = Application.GetSaveAsFilename(InitialFileName:=titlecds, _
+    FileFilter:="Excel Macro Enabled Workbook (*.xlsm), *.xlsm)")
+    
+    If fileSaveName = False Then
+        Exit Sub
+    End If
+    
+    ActiveWorkbook.SaveAs Filename:=fileSaveName, FileFormat:=xlOpenXMLWorkbookMacroEnabled
+    ActiveWorkbook.Sheets("AWLtest").Visible = False
+    ActiveWorkbook.Sheets("ACN").Visible = False
+    ActiveWorkbook.Sheets("A4 Template").Visible = False
+    ActiveWorkbook.Sheets("A3 Template").Visible = False
+    ActiveWorkbook.Sheets("A4 Template 00").Visible = False
+    ActiveWorkbook.Sheets("A3 Template 00").Visible = False
+    ActiveWorkbook.Sheets("CONCEPT MODEL PHOTO").Visible = False
+    ActiveWorkbook.Save
+    'ActiveWorkbook.Close
+
+ElseIf shortform = "CS" Then
+    ActiveWorkbook.Save
+    Sheets("CONCEPT MODEL PHOTO").Visible = True
+    'Sheets(Array("DR", "DESIGN SPECIFICATIONS", "CONCEPT MODEL PHOTO")).Select
+    'Sheets("CONCEPT MODEL PHOTO").Activate
+    'Sheets(Array("DR", "DESIGN SPECIFICATIONS", "CONCEPT MODEL PHOTO")).Copy
+    'Debug.Print ("ZERO VALUE" & CStr(Cells(lastdsrow, 9).Value))
+    titlecds = Cells(lastdsrow, 6).Value & Cells(lastdsrow, 7).Value & Cells(lastdsrow, 8).Value & Cells(lastdsrow, 9).Value & " " & Sheets("DESIGN SPECIFICATIONS").Range("K2").Value
+    
+    fileSaveName = Application.GetSaveAsFilename(InitialFileName:=titlecds, _
+    FileFilter:="Excel Macro Enabled Workbook (*.xlsm), *.xlsm)")
+    
+    If fileSaveName = False Then
+        Exit Sub
+    End If
+    
+'    'if escape key pressed
+'    If GetAsyncKeyState(vbKeyEscape) <> 0 Then
+'        Exit Sub
+'    End If
+    
+    ActiveWorkbook.SaveAs Filename:=fileSaveName, FileFormat:=xlOpenXMLWorkbookMacroEnabled
+    ActiveWorkbook.Sheets("AWLtest").Visible = False
+    ActiveWorkbook.Sheets("ACN").Visible = False
+    ActiveWorkbook.Sheets("A4 Template").Visible = False
+    ActiveWorkbook.Sheets("A3 Template").Visible = False
+    ActiveWorkbook.Sheets("A4 Template 00").Visible = False
+    ActiveWorkbook.Sheets("A3 Template 00").Visible = False
+    ActiveWorkbook.Save
+    'ActiveWorkbook.Close
+    
+Else:
+    lastdesignrow = Range("F" & CStr(lastdsrow)).End(xlUp).Row
+    titlecds = Cells(lastdesignrow, 6).Value & Cells(lastdesignrow, 7).Value & Cells(lastdesignrow, 8).Value & Cells(lastdesignrow, 9).Value
+    
+    titlecds = Cells(lastdsrow, 6).Value & Cells(lastdsrow, 7).Value & Cells(lastdsrow, 8).Value & Cells(lastdsrow, 9).Value
+    
+    fileSaveName = Application.GetSaveAsFilename(InitialFileName:=titlecds, _
+    FileFilter:="Excel Macro Enabled Workbook (*.xlsm), *.xlsm)")
+    
+    If fileSaveName = False Then
+        Exit Sub
+    End If
+    
+'    'if escape key pressed
+'    If GetAsyncKeyState(vbKeyEscape) <> 0 Then
+'        Exit Sub
+'    End If
+    
+    ActiveWorkbook.SaveAs Filename:=fileSaveName, FileFormat:=xlOpenXMLWorkbookMacroEnabled
+    ActiveWorkbook.Close
+    
+End If
+
+'ActiveWorkbook.Sheets("AWLtest").Select
+End Sub
+
+
+
+Private Sub Worksheet_BeforeDoubleClick(ByVal Target As Range, Cancel As Boolean)
+Cancel = True
+End Sub
+
+Private Sub Worksheet_SelectionChange(ByVal Target As Range)
+        'hide and display sankakus on DR sheet
+    If Sheets("DR").Range("16:18").EntireRow.Hidden = True Then
+        Sheets("DR").Shapes("CD_3").Visible = False
+        Sheets("DR").Shapes("CD_4").Visible = False
+        Sheets("DR").Shapes("CD_5").Visible = False
+    Else
+        Sheets("DR").Shapes("CD_3").Visible = True
+        Sheets("DR").Shapes("CD_4").Visible = True
+        Sheets("DR").Shapes("CD_5").Visible = True
+    End If
+    
+    If Sheets("DR").Range("22:24").EntireRow.Hidden = True Then
+        Sheets("DR").Shapes("SD_3").Visible = False
+        Sheets("DR").Shapes("SD_4").Visible = False
+        Sheets("DR").Shapes("SD_5").Visible = False
+    Else
+        Sheets("DR").Shapes("SD_3").Visible = True
+        Sheets("DR").Shapes("SD_4").Visible = True
+        Sheets("DR").Shapes("SD_5").Visible = True
+    End If
+    
+    If Sheets("DR").Range("34:36").EntireRow.Hidden = True Then
+        Sheets("DR").Shapes("DS_6").Visible = False
+        Sheets("DR").Shapes("DS_7").Visible = False
+        Sheets("DR").Shapes("DS_8").Visible = False
+    Else
+        Sheets("DR").Shapes("DS_6").Visible = True
+        Sheets("DR").Shapes("DS_7").Visible = True
+        Sheets("DR").Shapes("DS_8").Visible = True
+    End If
+    
+    
+End Sub
+Public Sub grey_out_on_opening_workbook()
+Worksheets("DR").Union(Range("J13:M18"), Range("P14:AC18")).Interior.Color = RGB(217, 217, 217)
+End Sub
+
+
+Private Sub WorkSheet_Change(ByVal Target As Range)
+
+'Debug.Print ("number of sheets:" & CStr(numberOfSheets))
+
+'grey out concept design stage if its filled and only when rest of 2 stages not filled
+'If Not Application.Intersect(Target, Range("J13:M18")) Is Nothing And IsEmpty(Range("J19").Value) And IsEmpty(Range("J27").Value) Then
+If Not Application.Intersect(Target, Range("J13:M18")) Is Nothing Then
+Union(Range("J13:M18"), Range("P14:AC18")).Interior.Color = RGB(217, 217, 217)
+Union(Range("B19:AC24"), Range("B25:AC33")).Interior.Color = xlNone
+Sheets("DESIGN SPECIFICATIONS").Range("U3").Value = "1" & "/" & "2"
+latestdate_conceptdesign
+    
+
+'concept design stage: if user clears content of a cell, update date to latest date (date of the cell above)
+If Target.Text = "" Then
+    Worksheets("DESIGN SPECIFICATIONS").Range("R4").Value = Target.Offset(-1, 0).Value
+    Worksheets("DESIGN SPECIFICATIONS").Range("D2:G3").Value = Target.Offset(-1, -4).Value & Target.Offset(-1, -3).Value & Target.Offset(-1, -2).Value & Target.Offset(-1, -1).Value
+End If
+
+
+
+
+
+'grey out styling design stage if its filled and only when design spec stage is not filled
+'ElseIf Not Application.Intersect(Target, Range("J19:M24")) Is Nothing And IsEmpty(Range("J27").Value) Then
+ElseIf Not Application.Intersect(Target, Range("J19:M24")) Is Nothing Then
+Union(Range("J19:M24"), Range("P20:AC24")).Interior.Color = RGB(217, 217, 217)
+Union(Range("B11:AC18"), Range("B25:AC33")).Interior.Color = xlNone
+'Hide the concept model photo sheet (but to user it seems that sheet is 'deleted') and update page number of design spec sheet to pg 1/1
+Sheets("CONCEPT MODEL PHOTO").Range("S28").ClearContents
+Sheets("CONCEPT MODEL PHOTO").Visible = False
+Sheets("DESIGN SPECIFICATIONS").Range("U3").Value = "1" & "/" & "1"
+latestdate_stylingdesign
+
+'styling design stage: if user clears content of a cell, update date to latest date (date of the cell above)
+If Target.Text = "" Then
+    Worksheets("DESIGN SPECIFICATIONS").Range("R4").Value = Target.Offset(-1, 0).Value
+    Worksheets("DESIGN SPECIFICATIONS").Range("D2:G3").Value = Target.Offset(-1, -4).Value & Target.Offset(-1, -3).Value & Target.Offset(-1, -2).Value & Target.Offset(-1, -1).Value
+End If
+
+
+
+'grey out design specifications stage
+ElseIf Not Application.Intersect(Target, Range("J27:M36")) Is Nothing Then
+Union(Range("J27:M36"), Range("P29:AC36")).Interior.Color = RGB(217, 217, 217)
+Union(Range("B11:AC18"), Range("B19:AC24")).Interior.Color = xlNone
+Sheets("DESIGN SPECIFICATIONS").Range("U3").Value = "1" & "/" & "1"
+latestdate_designspec
+
+'styling design stage: if user clears content of a cell, update date to latest date (date of the cell above)
+If Target.Text = "" Then
+    Worksheets("DESIGN SPECIFICATIONS").Range("R4").Value = Target.Offset(-1, 0).Value
+    Worksheets("DESIGN SPECIFICATIONS").Range("D2:G3").Value = Target.Offset(-1, -4).Value & Target.Offset(-1, -1).Value
+End If
+End If
+
+
+    'update description in sankakus for concept design stage
+    If Not Application.Intersect(Target, Range("P14:AC18")) Is Nothing Then
+    sankaku_num = 1
+   
+        For i = 14 To 18
+            If Not IsEmpty(Cells(i, 10)) And Not IsEmpty(Cells(i, 16)) Then
+                Set changeContentCell = Sheets("DESIGN SPECIFICATIONS").Range("O:O").Find(what:=sankaku_num)
+                Set changeContentOffsetCell = changeContentCell.Offset(0, 1)
+                
+                changeContentOffsetCell.Value = Sheets("DR").Range("J" & CStr(i)).Value & ", " & Sheets("DR").Range("P" & CStr(i)).Value & ", " & Sheets("DESIGN SPECIFICATIONS").Range("O4").Value
+                sankaku_num = sankaku_num + 1
+                'Sheets("DESIGN SPECIFICATIONS").Range("P" & CStr(sankaku_num)).Value = Sheets("DR").Range("J" & CStr(i)).Value & ", " & Sheets("DR").Range("P" & CStr(i)).Value & ", " & Sheets("DESIGN SPECIFICATIONS").Range("O4").Value
+                'sankaku_num = sankaku_num - 1
+            
+            Else
+                'Sheets("DESIGN SPECIFICATIONS").Range("P" & CStr(sankaku_num)).Value = " "
+                Set changeContentCell = Sheets("DESIGN SPECIFICATIONS").Range("O:O").Find(what:=sankaku_num)
+                Set changeContentOffsetCell = changeContentCell.Offset(0, 1)
+                
+                changeContentOffsetCell.Value = ""
+            End If
+        Next i
+    End If
+    
+    
+    'update description in sankakus for styling design stage
+    If Not Application.Intersect(Target, Range("P20:AC24")) Is Nothing Then
+    sankaku_num = 1
+   
+        For i = 20 To 24
+            If Not IsEmpty(Cells(i, 10)) And Not IsEmpty(Cells(i, 16)) Then
+                'Sheets("DESIGN SPECIFICATIONS").Range("P" & CStr(sankaku_num)).Value = Sheets("DR").Range("J" & CStr(i)).Value & ", " & Sheets("DR").Range("P" & CStr(i)).Value & ", " & Sheets("DESIGN SPECIFICATIONS").Range("O4").Value
+                'sankaku_num = sankaku_num - 1
+                Set changeContentCell = Sheets("DESIGN SPECIFICATIONS").Range("O:O").Find(what:=sankaku_num)
+                Set changeContentOffsetCell = changeContentCell.Offset(0, 1)
+                
+                changeContentOffsetCell.Value = Sheets("DR").Range("J" & CStr(i)).Value & ", " & Sheets("DR").Range("P" & CStr(i)).Value & ", " & Sheets("DESIGN SPECIFICATIONS").Range("O4").Value
+                sankaku_num = sankaku_num + 1
+            
+            Else
+                'Sheets("DESIGN SPECIFICATIONS").Range("P" & CStr(sankaku_num)).Value = " "
+                Set changeContentCell = Sheets("DESIGN SPECIFICATIONS").Range("O:O").Find(what:=sankaku_num)
+                Set changeContentOffsetCell = changeContentCell.Offset(0, 1)
+                
+                changeContentOffsetCell.Value = ""
+            End If
+        Next i
+    End If
+    
+    'update description in sankakus for design specifications stage
+    If Not Application.Intersect(Target, Range("P29:AC36")) Is Nothing Then
+    sankaku_num = 1
+   
+        For i = 29 To 36
+            If Not IsEmpty(Cells(i, 16)) And Not IsEmpty(Cells(i, 10)) Then
+                
+                'if fill in sankaku 6 on 'DR' sheet
+                If i = 34 Then
+                    'triangle 6 appears with a bottom border line
+                    Sheets("DESIGN SPECIFICATIONS").Shapes("changes_6").Visible = True
+                    Set changeContentExtraSankakuCell = Sheets("DESIGN SPECIFICATIONS").Range("O:O").Find(what:="6")
+                    rowNumExtraSankaku = changeContentExtraSankakuCell.Row
+                    Sheets("DESIGN SPECIFICATIONS").Range("P" & CStr(rowNumExtraSankaku) & ":U" & CStr(rowNumExtraSankaku)).Borders(xlEdgeBottom).LineStyle = xlContinuous
+                    
+                    
+                End If
+                
+                If i = 35 Then
+                    'triangle 7 appears with a bottom border line
+                    Sheets("DESIGN SPECIFICATIONS").Shapes("changes_7").Visible = True
+                    Set changeContentExtraSankakuCell = Sheets("DESIGN SPECIFICATIONS").Range("O:O").Find(what:="7")
+                    rowNumExtraSankaku = changeContentExtraSankakuCell.Row
+                    Sheets("DESIGN SPECIFICATIONS").Range("P" & CStr(rowNumExtraSankaku) & ":U" & CStr(rowNumExtraSankaku)).Borders(xlEdgeBottom).LineStyle = xlContinuous
+
+
+                End If
+                
+                If i = 36 Then
+                    'triangle 8 appears with a bottom border line
+                    Sheets("DESIGN SPECIFICATIONS").Shapes("changes_8").Visible = True
+                    Set changeContentExtraSankakuCell = Sheets("DESIGN SPECIFICATIONS").Range("O:O").Find(what:="8")
+                    rowNumExtraSankaku = changeContentExtraSankakuCell.Row
+                    Sheets("DESIGN SPECIFICATIONS").Range("P" & CStr(rowNumExtraSankaku) & ":U" & CStr(rowNumExtraSankaku)).Borders(xlEdgeBottom).LineStyle = xlContinuous
+                    
+                End If
+                
+                'Sheets("DESIGN SPECIFICATIONS").Range("P" & CStr(sankaku_num)).Value = Sheets("DR").Range("J" & CStr(i)).Value & ", " & Sheets("DR").Range("P" & CStr(i)).Value & ", " & Sheets("DESIGN SPECIFICATIONS").Range("O4").Value
+                'sankaku_num = sankaku_num - 1
+                Set changeContentCell = Sheets("DESIGN SPECIFICATIONS").Range("O:O").Find(what:=sankaku_num)
+                Set changeContentOffsetCell = changeContentCell.Offset(0, 1)
+                
+                changeContentOffsetCell.Value = Sheets("DR").Range("J" & CStr(i)).Value & ", " & Sheets("DR").Range("P" & CStr(i)).Value & ", " & Sheets("DESIGN SPECIFICATIONS").Range("O4").Value
+                sankaku_num = sankaku_num + 1
+            
+            Else
+
+                
+                '----start of if delete changes of sankaku 6 and above on DR sheet, make respective sankakus visibility false and remove respective bottom borders
+                If i = 34 Then
+                    'triangle 6 disappears along with its bottom border line
+                    Sheets("DESIGN SPECIFICATIONS").Shapes("changes_6").Visible = False
+                    Set changeContentExtraSankakuCell = Sheets("DESIGN SPECIFICATIONS").Range("O:O").Find(what:="6")
+                    rowNumExtraSankaku = changeContentExtraSankakuCell.Row
+                    Sheets("DESIGN SPECIFICATIONS").Range("P" & CStr(rowNumExtraSankaku) & ":U" & CStr(rowNumExtraSankaku)).Borders(xlEdgeBottom).LineStyle = xlNone
+
+
+                End If
+
+                If i = 35 Then
+                    'triangle 7 disappears along with its bottom border line
+                    Sheets("DESIGN SPECIFICATIONS").Shapes("changes_7").Visible = False
+                    Set changeContentExtraSankakuCell = Sheets("DESIGN SPECIFICATIONS").Range("O:O").Find(what:="7")
+                    rowNumExtraSankaku = changeContentExtraSankakuCell.Row
+                    Sheets("DESIGN SPECIFICATIONS").Range("P" & CStr(rowNumExtraSankaku) & ":U" & CStr(rowNumExtraSankaku)).Borders(xlEdgeBottom).LineStyle = xlNone
+
+
+                End If
+
+                If i = 36 Then
+                    'triangle 8 disappears along with its bottom border line
+                    Sheets("DESIGN SPECIFICATIONS").Shapes("changes_8").Visible = False
+                    Set changeContentExtraSankakuCell = Sheets("DESIGN SPECIFICATIONS").Range("O:O").Find(what:="8")
+                    rowNumExtraSankaku = changeContentExtraSankakuCell.Row
+                    Sheets("DESIGN SPECIFICATIONS").Range("P" & CStr(rowNumExtraSankaku) & ":U" & CStr(rowNumExtraSankaku)).Borders(xlEdgeBottom).LineStyle = xlNone
+
+                End If
+                '-----end of if delete changes of sankaku 6 and above on DR sheet, make respective sankakus visibility false and remove respective bottom borders
+
+                            'Sheets("DESIGN SPECIFICATIONS").Range("P" & CStr(sankaku_num)).Value = " "
+                Set changeContentCell = Sheets("DESIGN SPECIFICATIONS").Range("O:O").Find(what:=sankaku_num)
+                'Debug.Print ("SANKAKU NUM: " & CStr(sankaku_num))
+                Set changeContentOffsetCell = changeContentCell.Offset(0, 1)
+                
+                changeContentOffsetCell.Value = ""
+            End If
+        Next i
+    End If
+
+
+'clear the sankakus content in DESIGN SPEC sheet whenever start a new design stage
+If Not Application.Intersect(Target, Range("J19")) Is Nothing Then
+'clear the sankakus
+For i = 1 To 5
+Set sankakuNumberCell = Sheets("DESIGN SPECIFICATIONS").Range("O:O").Find(what:=i)
+Set sankakuNumberCellToClear = sankakuNumberCell.Offset(0, 1)
+sankakuNumberCellToClear.Value = " "
+
+Next i
+
+End If
+
+If Not Application.Intersect(Target, Range("J27")) Is Nothing Then
+'clear the sankakus
+For i = 1 To 5
+Set sankakuNumberCell = Sheets("DESIGN SPECIFICATIONS").Range("O:O").Find(what:=i)
+sankakuNumberCell.Offset(0, 1).Value = " "
+Next i
+
+End If
+
+If Not Application.Intersect(Target, Range("J13")) Is Nothing Then
+'clear the sankakus
+For i = 1 To 5
+Set sankakuNumberCell = Sheets("DESIGN SPECIFICATIONS").Range("O:O").Find(what:=i)
+sankakuNumberCell.Offset(0, 1).Value = " "
+Next i
+
+End If
+
+
+End Sub
+Sub latestdate_conceptdesign()
+
+'concept design stage
+
+Dim issuedate As Variant
+Dim drawcode As Variant
+Dim first_issue_date As Variant
+
+'get first issue date
+
+Worksheets("DESIGN SPECIFICATIONS").Range("R2").Value = Worksheets("DR").Cells(13, 10).Value
+
+'update first issue date in DR sheet below design person
+Worksheets("DR").Range("W9").Value = Worksheets("DR").Cells(13, 10).Value
+
+For i = 13 To 18
+
+    If Not IsEmpty(Worksheets("DR").Cells(i, 10).Value) Then
+        issuedate = Worksheets("DR").Cells(i, 10).Value
+        drawcode = Sheets("DR").Cells(i, 9).Value
+        If drawcode <> 0 Then
+        drawcode = Worksheets("DR").Cells(i, 6).Value & Worksheets("DR").Cells(i, 7).Value & "0" & Worksheets("DR").Cells(i, 9).Value
+        Else
+        drawcode = Worksheets("DR").Cells(i, 6).Value & Worksheets("DR").Cells(i, 7).Value & Worksheets("DR").Cells(i, 9).Value
+        End If
+        'Debug.Print ("HASSSS" & CStr(Sheets("DR").Cells(i, 9).Value))
+        'Debug.Print ("conceptdesign stage drawcodenum" & drawcode)
+    End If
+
+Next i
+
+'On Error GoTo ErrHandler:
+Worksheets("DESIGN SPECIFICATIONS").Range("R4").Value = issuedate
+Worksheets("DESIGN SPECIFICATIONS").Range("D2:G3").Value = drawcode
+
+
+
+'ErrHandler:
+'Debug.Print ("Runtime Error in latestdate() sub")
+
+End Sub
+
+
+
+Sub latestdate_stylingdesign()
+
+'styling design stage
+
+Dim issuedate As Variant
+Dim drawcode As Variant
+Dim first_issue_date As Variant
+
+'get first issue date
+first_issue_date = Worksheets("DR").Cells(19, 10).Value
+Worksheets("DESIGN SPECIFICATIONS").Range("R2").Value = first_issue_date
+
+Worksheets("DR").Range("W9").Value = first_issue_date
+
+
+For i = 19 To 24
+
+    If Not IsEmpty(Worksheets("DR").Cells(i, 10).Value) Then
+        issuedate = Worksheets("DR").Cells(i, 10).Value
+        drawcode = Sheets("DR").Cells(i, 9).Value
+        
+        If drawcode <> 0 Then
+        drawcode = Worksheets("DR").Cells(i, 6).Value & Worksheets("DR").Cells(i, 7).Value & "0" & Worksheets("DR").Cells(i, 9).Value
+        Else
+        drawcode = Worksheets("DR").Cells(i, 6).Value & Worksheets("DR").Cells(i, 7).Value & Worksheets("DR").Cells(i, 9).Value
+        End If
+        
+    End If
+
+Next i
+
+
+Worksheets("DESIGN SPECIFICATIONS").Range("R4").Value = issuedate
+Worksheets("DESIGN SPECIFICATIONS").Range("D2:G3").Value = drawcode
+
+
+
+
+End Sub
+
+
+Sub latestdate_designspec()
+'design specifications stage
+
+Dim issuedate As Variant
+Dim drawcode As Variant
+Dim first_issue_date As Variant
+
+'get first issue date
+first_issue_date = Worksheets("DR").Cells(27, 10).Value
+Worksheets("DESIGN SPECIFICATIONS").Range("R2").Value = first_issue_date
+
+Worksheets("DR").Range("W9").Value = first_issue_date
+
+For i = 27 To 36
+
+    If Not IsEmpty(Worksheets("DR").Cells(i, 10).Value) Then
+        issuedate = Worksheets("DR").Cells(i, 10).Value
+        'drawcode = Worksheets("DR").Cells(i, 6).Value & Worksheets("DR").Cells(i, 9).Value
+        drawcode = Sheets("DR").Cells(i, 9).Value
+        'Debug.Print ("DRAWCODE DS" & CStr(drawcode))
+        If drawcode <> "00" Then
+        drawcode = Worksheets("DR").Cells(i, 6).Value & Worksheets("DR").Cells(i, 7).Value & "0" & Worksheets("DR").Cells(i, 9).Value
+        Else
+        drawcode = Worksheets("DR").Cells(i, 6).Value & Worksheets("DR").Cells(i, 7).Value & Worksheets("DR").Cells(i, 9).Value
+        End If
+    End If
+
+Next i
+
+Worksheets("DESIGN SPECIFICATIONS").Range("R4").Value = issuedate
+Worksheets("DESIGN SPECIFICATIONS").Range("D2:G3").Value = drawcode
+
+
+
+End Sub
+
+'
+'    Private Sub Command1_KeyPress(KeyAscii As Integer)
+'    If KeyAscii = 27 Then
+'    Debug.Print ("You have clicked on the ESC key")
+'    End If
+'    End Sub
