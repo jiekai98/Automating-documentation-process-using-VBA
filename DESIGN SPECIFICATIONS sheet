@@ -1,0 +1,1044 @@
+
+Private Sub draftingModeToggleButton_Click()
+    If Application.EnableEvents = True Then
+        'turn drafting mode on
+        Application.EnableEvents = False
+        'make indication notice to user that drafting mode is turned on
+        ActiveSheet.Shapes("draftingModeSign").Visible = True
+        ActiveSheet.Shapes("draftingModeSign").TextFrame.Characters.Text = "DRAFTING MODE ON"
+        
+    Else
+                'turn drafting mode off
+        Application.EnableEvents = True
+
+        'display text in indication notice that drafting mode is turned off
+        
+       
+        'ActiveSheet.Shapes("draftingModeSignOff").Select
+        'Selection.ShapeRange.ZOrder msoBringToFront
+
+
+        
+        'make indication notice to user that drafting mode is turned off
+        ActiveSheet.Shapes("draftingModeSign").Visible = False
+'                'wait 3 seconds for user to see message that drfting mode is turned off ==> back to macro enabled mode
+'        newHour = Hour(Now())
+'        newMinute = Minute(Now())
+'        newSecond = Second(Now()) + 3
+'        waitTime = TimeSerial(newHour, newMinute, newSecond)
+'        Application.Wait waitTime
+        
+        
+    End If
+End Sub
+Sub test()
+
+Dim FirstRowNo As Long
+FirstRowNo = 8
+
+Dim LastRowNo As Long
+LastRowNo = Range("PROCESS_REFERENCES").Row
+
+Dim SerialNoColNo As Long
+SerialNoColNo = 2
+
+Dim PartNameColNo As Long
+PartNameColNo = 3
+
+Dim IdentityColNo As Long
+IdentityColNo = 4
+
+Dim MaxIdentityNo As Long
+MaxIdentityNo = Application.WorksheetFunction.Max(Range(Cells(FirstRowNo, IdentityColNo), Cells(LastRowNo - 1, IdentityColNo)))
+
+For i = FirstRowNo To LastRowNo - 1
+    If Cells(FirstRowNo, SerialNoColNo).Value <> "" And Cells(FirstRowNo, PartNameColNo).Value <> "" And Cells(FirstRowNo, IdentityColNo).Value = "" Then
+
+    Cells(FirstRowNo, IdentityColNo).Value = MaxIdentityNo + 1
+    
+    FirstRowNo = FirstRowNo + 1
+    MaxIdentityNo = Application.WorksheetFunction.Max(Range(Cells(FirstRowNo, IdentityColNo), Cells(LastRowNo - 1, IdentityColNo)))
+
+    End If
+Next i
+
+
+
+End Sub
+Private Sub generateAndReassignPins_Click()
+    
+    'filling up invisible col identity numbers for the first time pins are generated
+'    initialRowNum = 7
+'    invisibleCellValue = 1
+'    While Not IsEmpty(Cells(initialRowNum + 1, 3)) And IsEmpty(Cells(initialRowNum + 1, 4))
+'        Cells(initialRowNum + 1, 4).Value = invisibleCellValue
+'        invisibleCellValue = invisibleCellValue + 1
+'
+'    initialRowNum = initialRowNum + 1
+'    Wend
+
+Dim FirstRowNo As Long
+FirstRowNo = 8
+
+Dim LastRowNo As Long
+LastRowNo = Range("PROCESS_REFERENCES").Row
+
+Dim SerialNoColNo As Long
+SerialNoColNo = 2
+
+Dim PartNameColNo As Long
+PartNameColNo = 3
+
+Dim IdentityColNo As Long
+IdentityColNo = 4
+
+Dim MaxIdentityNo As Long
+MaxIdentityNo = Application.WorksheetFunction.Max(Range(ActiveSheet.Cells(FirstRowNo, IdentityColNo), ActiveSheet.Cells(LastRowNo - 1, IdentityColNo)))
+
+
+For i = FirstRowNo To LastRowNo - 1
+    If Cells(FirstRowNo, SerialNoColNo).Value <> "" And Cells(FirstRowNo, PartNameColNo).Value <> "" And Cells(FirstRowNo, IdentityColNo).Value = "" Then
+
+    Cells(FirstRowNo, IdentityColNo).Value = MaxIdentityNo + 1
+
+    
+    MaxIdentityNo = Application.WorksheetFunction.Max(Range(ActiveSheet.Cells(FirstRowNo, IdentityColNo), ActiveSheet.Cells(LastRowNo - 1, IdentityColNo)))
+    
+    'Debug.Print ("MaxIdentityNo = " & CStr(MaxIdentityNo))
+        If Not shapeExists("G" & CStr(Cells(FirstRowNo, IdentityColNo).Value)) Then
+            Set smallcircle = ActiveSheet.Shapes.AddShape(msoShapeOval, 926.17, 112, 3.5999212598, 3.5999212598)
+            Set connector = ActiveSheet.Shapes.AddConnector(msoConnectorStraight, 927.75, 115.5922834646, 927.9388976378, 176.062519685)
+            connector.ConnectorFormat.BeginConnect smallcircle, 5
+            Set circle_shape = ActiveSheet.Shapes.AddShape(msoShapeOval, 918.891496063, 105.2582677165, 17.8723622047, 17.8749606299)
+        
+            circle_shape.Name = "circle" & CStr(Cells(FirstRowNo, IdentityColNo).Value)
+        
+        
+            circle_shape.TextFrame.Characters.Text = CStr(Cells(FirstRowNo, SerialNoColNo))
+            circle_shape.TextFrame.Characters.Font.Size = 9
+            circle_shape.TextFrame2.TextRange.Font.Name = "Helvetica"
+            circle_shape.Select
+            Selection.ShapeRange.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+            Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+            Selection.ShapeRange.lockaspectratio = msoTrue
+            Selection.Locked = msoTrue
+            Selection.Placement = xlFreeFloating
+        
+            ActiveSheet.Shapes.Range(Array(circle_shape.Name, connector.Name, smallcircle.Name)).Select
+        
+            Selection.ShapeRange.Group.Select
+            Selection.Name = "G" & CStr(Cells(FirstRowNo, IdentityColNo).Value)
+            Selection.Placement = xlFreeFloating
+        End If
+        
+        
+
+    End If
+    
+    If Cells(FirstRowNo, SerialNoColNo).Value <> "" And Cells(FirstRowNo, PartNameColNo).Value <> "" And Cells(FirstRowNo, IdentityColNo).Value <> "" Then
+        'if user starts new document and deletes the pins (but identity num is still filled)
+         If Not shapeExists("G" & CStr(Cells(FirstRowNo, IdentityColNo).Value)) Then
+            Set smallcircle = ActiveSheet.Shapes.AddShape(msoShapeOval, 926.17, 112, 3.5999212598, 3.5999212598)
+            Set connector = ActiveSheet.Shapes.AddConnector(msoConnectorStraight, 927.75, 115.5922834646, 927.9388976378, 176.062519685)
+            connector.ConnectorFormat.BeginConnect smallcircle, 5
+            Set circle_shape = ActiveSheet.Shapes.AddShape(msoShapeOval, 918.891496063, 105.2582677165, 17.8723622047, 17.8749606299)
+        
+            circle_shape.Name = "circle" & CStr(Cells(FirstRowNo, IdentityColNo).Value)
+        
+        
+            circle_shape.TextFrame.Characters.Text = CStr(Cells(FirstRowNo, SerialNoColNo))
+            circle_shape.TextFrame.Characters.Font.Size = 9
+            circle_shape.TextFrame2.TextRange.Font.Name = "Helvetica"
+            circle_shape.Select
+            Selection.ShapeRange.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+            Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+            Selection.ShapeRange.lockaspectratio = msoTrue
+            Selection.Locked = msoTrue
+            Selection.Placement = xlFreeFloating
+        
+            ActiveSheet.Shapes.Range(Array(circle_shape.Name, connector.Name, smallcircle.Name)).Select
+        
+            Selection.ShapeRange.Group.Select
+            Selection.Name = "G" & CStr(Cells(FirstRowNo, IdentityColNo).Value)
+            Selection.Placement = xlFreeFloating
+        End If
+        
+        ''3) update existing circle no.s with new S/N (update S/N of existing pins) by gg thru every serial num and comparing with its corresponding num in invisble col.if same skip, else update S/N of pin to the number in serial num col
+        If Cells(FirstRowNo, SerialNoColNo).Value <> Cells(FirstRowNo, IdentityColNo).Value Then
+            serialNumOfRow = Cells(FirstRowNo, SerialNoColNo).Value
+            invisibleNumOfRow = Cells(FirstRowNo, IdentityColNo).Value
+    
+            ActiveSheet.Shapes("circle" & CStr(invisibleNumOfRow)).Select
+            Selection.ShapeRange.TextFrame2.TextRange.Characters.Text = CStr(serialNumOfRow)
+            Selection.ShapeRange.TextFrame2.TextRange.Characters.Font.Name = "Helvetica"
+            Selection.ShapeRange.TextFrame2.TextRange.Characters.Font.Size = 9
+            
+        Else
+            'do nothing
+        End If
+    End If
+    
+    
+    FirstRowNo = FirstRowNo + 1
+Next i
+
+    '-------Reassigning Pins when row inserted and creating pins--------------------
+
+    
+    '1)fill up empty cells in invisible "IDENTITY" column with running order numbers
+    
+    'find largest invisible number of the invisible column
+    
+'    lastFilledCellInvisibleValue = Application.WorksheetFunction.Max(Range("D8:D200"))
+'    'Debug.Print ("max value of invi col: " & CStr(lastFilledCellInivisibleValue))
+'    firstRowNum = 7
+'    serialNumLabel = 1
+'    While Not IsEmpty(Cells(firstRowNum + 1, 3))
+'
+'
+'
+''        'help user reorder the S/N in running sequence
+''        Cells(firstRowNum + 1, 2).Value = serialNumLabel
+'    'while part name is filled, check if that row's invisible column cell is empty. if yes, fill in with next running number
+'        If IsEmpty(Cells(firstRowNum + 1, 4)) Then
+'            lastFilledCellInvisibleValue = lastFilledCellInvisibleValue + 1
+'            Cells(firstRowNum + 1, 4).Value = lastFilledCellInvisibleValue
+'
+'            ''2) create new circle no.s (due to inserting a row) with new S/N
+'
+'                    Set smallcircle = ActiveSheet.Shapes.AddShape(msoShapeOval, 926.17, 112, 3.5999212598, 3.5999212598)
+'                    Set connector = ActiveSheet.Shapes.AddConnector(msoConnectorStraight, 927.75, 115.5922834646, 927.9388976378, 176.062519685)
+'                    connector.ConnectorFormat.BeginConnect smallcircle, 5
+'                    Set circle_shape = ActiveSheet.Shapes.AddShape(msoShapeOval, 918.891496063, 105.2582677165, 17.8723622047, 17.8749606299)
+'                    'name circle with number from invisible column
+'                    circle_shape.Name = "circle" & CStr(lastFilledCellInvisibleValue)
+'                    'fill circle with the actual serial number
+'                    circle_shape.TextFrame.Characters.Text = CStr(Cells(firstRowNum + 1, 2).Value)
+'                    circle_shape.TextFrame.Characters.Font.Size = 9
+'                    circle_shape.TextFrame2.TextRange.Font.Name = "Helvetica"
+'                    circle_shape.Select
+'                    Selection.ShapeRange.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+'                    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+'                    Selection.ShapeRange.lockaspectratio = msoTrue
+'                    Selection.Locked = msoTrue
+'                    ActiveSheet.Shapes.Range(Array(circle_shape.Name, connector.Name, smallcircle.Name)).Select
+'                    Selection.ShapeRange.Group.Select
+'                    'name group with number from invisible column
+'                    Selection.Name = "G" & CStr(lastFilledCellInvisibleValue)
+'                    Selection.Placement = xlFreeFloating
+'
+'        End If
+'
+'        'generate pins if the pin group does not exist
+'        If Not shapeExists("G" & CStr(Cells(firstRowNum + 1, 4))) Then
+'    Set smallcircle = ActiveSheet.Shapes.AddShape(msoShapeOval, 926.17, 112, 3.5999212598, 3.5999212598)
+'    Set connector = ActiveSheet.Shapes.AddConnector(msoConnectorStraight, 927.75, 115.5922834646, 927.9388976378, 176.062519685)
+'    connector.ConnectorFormat.BeginConnect smallcircle, 5
+'    Set circle_shape = ActiveSheet.Shapes.AddShape(msoShapeOval, 918.891496063, 105.2582677165, 17.8723622047, 17.8749606299)
+'
+'    circle_shape.Name = "circle" & CStr(Cells(firstRowNum + 1, 4))
+'
+'
+'    circle_shape.TextFrame.Characters.Text = CStr(serialNumLabel)
+'    circle_shape.TextFrame.Characters.Font.Size = 9
+'    circle_shape.TextFrame2.TextRange.Font.Name = "Helvetica"
+'    circle_shape.Select
+'    Selection.ShapeRange.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+'    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+'    Selection.ShapeRange.lockaspectratio = msoTrue
+'    Selection.Locked = msoTrue
+'    Selection.Placement = xlFreeFloating
+'
+'    ActiveSheet.Shapes.Range(Array(circle_shape.Name, connector.Name, smallcircle.Name)).Select
+'
+'    Selection.ShapeRange.Group.Select
+'    Selection.Name = "G" & CStr(Cells(firstRowNum + 1, 4))
+'    Selection.Placement = xlFreeFloating
+'        End If
+'
+'    ''3) update existing circle no.s with new S/N (update S/N of existing pins) by gg thru every serial num and comparing with its corresponding num in invisble col.if same skip, else update S/N of pin to the number in serial num col
+'    If Cells(firstRowNum + 1, 2).Value <> Cells(firstRowNum + 1, 4).Value Then
+'        serialNumOfRow = Cells(firstRowNum + 1, 2).Value
+'        invisibleNumOfRow = Cells(firstRowNum + 1, 4).Value
+'
+'        ActiveSheet.Shapes("circle" & CStr(invisibleNumOfRow)).Select
+'        Selection.ShapeRange.TextFrame2.TextRange.Characters.Text = CStr(serialNumOfRow)
+'        Selection.ShapeRange.TextFrame2.TextRange.Characters.Font.Name = "Helvetica"
+'        Selection.ShapeRange.TextFrame2.TextRange.Characters.Font.Size = 9
+'
+'    Else
+'        'do nothing
+'    End If
+'
+'
+'
+'    firstRowNum = firstRowNum + 1
+'    'serialNumLabel = serialNumLabel + 1
+'    Wend
+    
+    
+    
+
+    
+    
+End Sub
+
+
+''click on generateAWL button
+'Private Sub CommandButton2_Click()
+'Application.ScreenUpdating = False
+'Application.DisplayAlerts = False
+''Application.Calculation = xlCalculationManual
+'Application.EnableEvents = False
+'count_partsname = Range("C8").End(xlDown).Row
+'
+'Worksheets("AWLtest").Visible = True
+''Worksheets("AWLtest").Range("B5:S" & CStr((count_partsname * 8) + 10)).Clear
+'Worksheets("AWLtest").Range("B5:S10000").Delete Shift:=xlUp
+'Dim arrawnum As Variant
+'Dim arrstr As Variant
+'
+''set i=5 to indicate to start generating border from row 5 of AWL sheet
+'i = 5
+'bvalue = 5
+''loop from row 8(first awnum) to last cell of artwork new column where there is content filled in cell
+'For k = 8 To Range("K2000").End(xlUp).Row
+'
+'    'get AW num of that row
+'    awnum = Range("K" & CStr(k)).Value
+'    'split the multiple AW num in a cell (separated by chr(13))
+'    arrawnum = Split(awnum, Chr(13))
+'
+'    'counts number of AW num (number of elements) in the cell
+'    arrelements = UBound(arrawnum) - LBound(arrawnum) + 1
+'
+'    'do this if cell has more than 1 AW num
+'    If arrelements > 1 Then
+'
+'        For j = 0 To arrelements - 1                'j to loop through all elements in the array
+'
+'            'calls borderAWL function to generate the border for each entry
+'            borderAWL8 (i)
+'
+'            'fill in part name in the cell of AWL sheet (get from column C of design spec sheet)
+'            Worksheets("AWLtest").Cells(i, 2).Value = Range("C" & k).Value
+'            Worksheets("AWLtest").Cells(i, 2).VerticalAlignment = xlCenter
+'            'get first element (first AW num) of the cell
+'            arrstr = arrawnum(j)
+'            Worksheets("AWLtest").Cells(i, 4).Value = arrstr & "-00"
+'
+'            'set the usage column of AWL according to A,B,C,D,E
+'            If Right(arrstr, 1) = "A" Then
+'                Worksheets("AWLtest").Cells(i, 3).Value = "PRINT"
+'
+'            ElseIf Right(arrstr, 1) = "B" Then
+'                Worksheets("AWLtest").Cells(i, 3).Value = "STICKER"
+'
+'            ElseIf Right(arrstr, 1) = "C" Then
+'                Worksheets("AWLtest").Cells(i, 3).Value = "MOLD"
+'
+'            ElseIf Right(arrstr, 1) = "D" Then
+'                Worksheets("AWLtest").Cells(i, 3).Value = "STAMPING"
+'
+'            ElseIf Right(arrstr, 1) = "E" Then
+'                Worksheets("AWLtest").Cells(i, 3).Value = "LASER"
+'
+'            End If
+'
+'            'set the row height to a fixed value
+'            Worksheets("AWLtest").Rows(CStr(i) & ":" & CStr(i + 7)).RowHeight = 18
+'            'hide the last 4 rows of each entry to display only 4 rows instead of 8
+'            Worksheets("AWLtest").Range(CStr(i + 4) & ":" & CStr(i + 7)).EntireRow.Hidden = True
+'
+'            'offset by x cells down to input the next new AWnum of another part name
+'            i = i + 8
+'
+'        Next j
+'
+'    'do this if num of AW num in a cell is 1
+'    ElseIf arrelements = 1 Then                     'arrelements = 1
+'        borderAWL8 (i)
+'
+'        awnum2 = Range("K" & CStr(k)).Value
+'        Worksheets("AWLtest").Cells(i, 2).Value = Range("C" & k).Value
+'        Worksheets("AWLtest").Cells(i, 2).VerticalAlignment = xlCenter
+'        If Right(awnum2, 1) = "A" Then
+'            Worksheets("AWLtest").Cells(i, 3).Value = "PRINT"
+'
+'        ElseIf Right(awnum2, 1) = "B" Then
+'            Worksheets("AWLtest").Cells(i, 3).Value = "STICKER"
+'
+'        ElseIf Right(awnum2, 1) = "C" Then
+'            Worksheets("AWLtest").Cells(i, 3).Value = "MOLD"
+'
+'        ElseIf Right(awnum2, 1) = "D" Then
+'            Worksheets("AWLtest").Cells(i, 3).Value = "STAMPING"
+'
+'        ElseIf Right(awnum2, 1) = "E" Then
+'            Worksheets("AWLtest").Cells(i, 3).Value = "LASER"
+'        End If
+'
+'        Worksheets("AWLtest").Cells(i, 4).Value = awnum2 & "-00"
+'    'set the row height to a fixed value
+'    Worksheets("AWLtest").Rows(CStr(i) & ":" & CStr(i + 7)).RowHeight = 18
+'    'hide the last 4 rows of each entry to display only 4 rows instead of 8
+'    Worksheets("AWLtest").Range(CStr(i + 4) & ":" & CStr(i + 7)).EntireRow.Hidden = True
+'    i = i + 8
+'
+'
+'    End If
+'
+'    '------------------------------------common aw num-----------------------------------------------
+'    'get AW num of that row
+'    awnumL = Range("L" & CStr(k)).Value
+'    'split the multiple AW num in a cell (separated by chr(13))
+'    arrawnumL = Split(awnumL, Chr(10))
+'
+'    'counts number of AW num (number of elements) in the cell
+'    arrelementsL = UBound(arrawnumL) - LBound(arrawnumL) + 1
+'    'Debug.Print ("num_elementsL:" & CStr(arrelementsL))
+'    'do this if cell has more than 1 AW num
+'    If arrelementsL > 1 Then
+'
+'        For j = 0 To arrelementsL - 1                'j to loop through all elements in the array
+'
+'            'calls borderAWL function to generate the border for each entry
+'            borderAWL8 (i)
+'
+'            'fill in part name in the cell of AWL sheet (get from column C of design spec sheet)
+'            Worksheets("AWLtest").Cells(i, 2).Value = Range("C" & k).Value
+'            Worksheets("AWLtest").Cells(i, 2).VerticalAlignment = xlCenter
+'            Worksheets("AWLtest").Cells(i, 2).HorizontalAlignment = xlCenter
+'            'get first element (first AW num) of the cell
+'            arrstr = arrawnumL(j)
+'            Worksheets("AWLtest").Cells(i, 4).Value = arrstr & "-00"
+'
+'            'set the usage column of AWL according to A,B,C,D,E
+'            If Right(arrstr, 1) = "A" Then
+'                Worksheets("AWLtest").Cells(i, 3).Value = "PRINT"
+'
+'            ElseIf Right(arrstr, 1) = "B" Then
+'                Worksheets("AWLtest").Cells(i, 3).Value = "STICKER"
+'
+'            ElseIf Right(arrstr, 1) = "C" Then
+'                Worksheets("AWLtest").Cells(i, 3).Value = "MOLD"
+'
+'            ElseIf Right(arrstr, 1) = "D" Then
+'                Worksheets("AWLtest").Cells(i, 3).Value = "STAMPING"
+'
+'            ElseIf Right(arrstr, 1) = "E" Then
+'                Worksheets("AWLtest").Cells(i, 3).Value = "LASER"
+'
+'            End If
+'
+'            'set the row height to a fixed value
+'            Worksheets("AWLtest").Rows(CStr(i) & ":" & CStr(i + 7)).RowHeight = 18
+'            'hide the last 4 rows of each entry to display only 4 rows instead of 8
+'            Worksheets("AWLtest").Range(CStr(i + 4) & ":" & CStr(i + 7)).EntireRow.Hidden = True
+'            'offset by x cells down to input the next new AWnum of another part name
+'            i = i + 8
+'
+'        Next j
+'
+'    'do this if num of AW num in a cell is 1
+'    ElseIf arrelementsL = 1 Then                     'arrelements = 1
+'        borderAWL8 (i)
+'
+'        awnum2 = Range("L" & CStr(k)).Value
+'        Worksheets("AWLtest").Cells(i, 2).Value = Range("C" & k).Value
+'        Worksheets("AWLtest").Cells(i, 2).VerticalAlignment = xlCenter
+'        Worksheets("AWLtest").Cells(i, 2).HorizontalAlignment = xlCenter
+'        If Right(awnum2, 1) = "A" Then
+'            Worksheets("AWLtest").Cells(i, 3).Value = "PRINT"
+'
+'        ElseIf Right(awnum2, 1) = "B" Then
+'            Worksheets("AWLtest").Cells(i, 3).Value = "STICKER"
+'
+'        ElseIf Right(awnum2, 1) = "C" Then
+'            Worksheets("AWLtest").Cells(i, 3).Value = "MOLD"
+'
+'        ElseIf Right(awnum2, 1) = "D" Then
+'            Worksheets("AWLtest").Cells(i, 3).Value = "STAMPING"
+'
+'        ElseIf Right(awnum2, 1) = "E" Then
+'            Worksheets("AWLtest").Cells(i, 3).Value = "LASER"
+'        End If
+'
+'        Worksheets("AWLtest").Cells(i, 4).Value = awnum2 & "-00"
+'
+'    'set the row height to a fixed value
+'    Worksheets("AWLtest").Rows(CStr(i) & ":" & CStr(i + 7)).RowHeight = 18
+'    'hide the last 4 rows of each entry to display only 4 rows instead of 8
+'    Worksheets("AWLtest").Range(CStr(i + 4) & ":" & CStr(i + 7)).EntireRow.Hidden = True
+'    i = i + 8
+'
+'
+'    End If
+'
+'    totalawnum = (arrelements + arrelementsL)
+'    rowsmerged = (totalawnum * 8) - 1
+'
+'    Call mergepn(bvalue, rowsmerged)
+'    bvalue = bvalue + rowsmerged + 1
+'
+'    Application.DisplayAlerts = False
+'
+'
+'Next k
+'
+''set row height of the list (excluding table below list) to a fixed value
+''Worksheets("AWLtest").Rows("1:" & CStr(i - 8)).RowHeight = 18
+'awlfont
+'    'copy the product name,page box and paste it below the genrated AW list table
+'    Worksheets("AWLtest").Range("Y7:Y8").Copy
+'    Worksheets("AWLtest").Range("B2000").End(xlUp).Offset(3, 0).PasteSpecial Paste:=xlPasteAll, Operation:=xlNone, SkipBlanks:= _
+'    False, Transpose:=False
+'
+'
+'    'Worksheets("AWLtest").Range("X12:AI14").Select
+'    'Selection.Copy
+'    'Worksheets("AWLtest").Range("G2000").End(xlUp).Offset(3, 0).Select
+'    'ActiveSheet.Paste
+'    With Sheets("AWLtest").Range("B:B")
+'    Set bottomCell = .Find(what:="PRODUCT")
+'    'bottomCell.EntireRow.Interior.Color = RGB(255, 255, 255)
+'    Set offsetCell = bottomCell.Offset(0, 5)
+'    'pull product name from concept design spec sheet
+'    Set offsetProductNameCell = bottomCell.Offset(1, 0)
+'    offsetProductNameCell.Value = Worksheets("DESIGN SPECIFICATIONS").Range("D4").Value
+'
+'    End With
+'    ' Now, your offsetCell has been created as a range, so go forth young padawan!
+'
+'Worksheets("AWLtest").Range("X12:AI14").Copy
+'offsetCell.PasteSpecial Paste:=xlPasteAll, Operation:=xlNone, SkipBlanks:= _
+'False, Transpose:=False
+'
+'    'generate 'drawn by' and 'Code No.' cell inputs
+'     With Sheets("AWLtest").Range("B:B")
+'     Set bottomCell = .Find(what:="PRODUCT")
+'     'pull designer name from concept design spec sheet
+'    Set offsetDrawnByCell = bottomCell.Offset(1, 11)
+'    offsetDrawnByCell.Value = Worksheets("DESIGN SPECIFICATIONS").Range("O2").Value
+'    'generate code number with latest version
+'    Set offsetCodeNoCell = bottomCell.Offset(2, 11)
+'    offsetCodeNoCell.Value = "AW-" & CStr(offsetProductNameCell.Value) & "-"
+'    offsetCodeNoCell.Font = "Arial"
+'    offsetCodeNoCell.Font.Size = 10
+'    End With
+'
+'
+''----remove the enter line of spaces with no spaces for each cell under code no. column (in case user inserts a space when filling in new AW num in concept design spec sheet.
+'
+'For s = 5 To Worksheets("AWLtest").Range("D2000").End(xlUp).Row
+'    Worksheets("AWLtest").Range("D" & CStr(s)) = Replace(Worksheets("AWLtest").Range("D" & CStr(s)), Chr(10), "")
+'Next s
+''-----------
+'
+'''----------indicate display messages to user that he can double click to generate AW (for -00) or ACN(for 01 and above versions)
+'''For k = 8 To Range("K2000").End(xlUp).Row
+''For n = 5 To Range("D2000").End(xlUp).Offset(-3, 0).Row
+''    Debug.Print ("hihi")
+''    'create display message if user single click on a -00 code number\
+''    If Right(Worksheets("AWLtest").Cells(i, 4), 1) = 0 Then
+''        Debug.Print ("Entered 00")
+''        doubleClickIndication_00
+''
+''    'create display message if user single click on a NON -00 code number
+''    ElseIf Right(Worksheets("AWLtest").Cells(i, 4), 1) <> 0 Then
+''    Debug.Print ("Entered NON 00")
+''        doubleClickIndication_Non_00
+''
+''    End If
+''
+''
+''Next n
+'''-----------
+'
+'
+'Application.ScreenUpdating = True
+''Application.Calculation = xlCalculationAutomatic
+'Application.DisplayAlerts = False
+'Application.EnableEvents = True
+'
+'Worksheets("AWLtest").Range("D2").ClearContents
+'Worksheets("AWLtest").Range("B1:S2").Interior.Color = xlNone
+'bottomrow = Worksheets("AWLtest").Range("D1000").Offset(8, 0).Row
+'Worksheets("AWLtest").Range("B" & CStr(bottomrow) & ":S" & CStr(bottomrow + 10)).Interior.Color = xlNone
+'
+'
+'
+'End Sub
+
+
+
+
+Private Sub WorkSheet_Change(ByVal Target As Range)
+
+'Application.ScreenUpdating = False
+'
+'On Error Resume Next
+'If Target.MergeArea.Columns.Count = 12 Then
+'    Exit Sub
+'End If
+''avoid creating a pin when typing a heder row when a row is merged.
+'
+'
+'If Intersect(Target, Range("C8:N35")) Is Nothing Then Exit Sub
+'
+'
+'Dim rowSerialNum As Variant
+'Dim circle_shape As Shape
+'Dim connector As Shape
+'Dim shpGroup As Variant
+'Dim smallcircle As Shape
+'Dim rownum As Integer
+'
+'
+''If Intersect(Target, Range("C8:C100")) Then
+''rowSerialNum = Target.Offset(0, -1).Value
+'rowSerialNum = Cells(Target.Row, 2).Value
+''Debug.Print ("ROW SERIAL NUM:  " & CStr(rowSerialNum))
+'
+'    'when user INSERTS a row: for creating a pin with no number: in the case where user inserts an empty row for DESIGN SPEC sheet
+'    If rowSerialNum = "" Then
+'        emptyRowNum = Target.Row
+'        'label S/N for current row that was just inserted
+'        emptyRowSerialNum = Cells(Target.Row, 2).Offset(-1, 0).Value + 1
+'        Cells(Target.Row, 2).Value = emptyRowSerialNum
+'
+'        'merge some cells in the inserted row
+'        Range("C" & CStr(emptyRowNum) & ":D" & CStr(emptyRowNum)).Merge
+'        Range("F" & CStr(emptyRowNum) & ":G" & CStr(emptyRowNum)).Merge
+'
+'        currentTargetRowNum = emptyRowNum
+'        'updates all S/N below the current inserted row
+'        While Not IsEmpty(Cells(currentTargetRowNum + 1, 2))
+'            Cells(currentTargetRowNum + 1, 2).Value = Cells(currentTargetRowNum + 1, 2).Offset(-1, 0).Value + 1
+'            currentTargetRowNum = currentTargetRowNum + 1
+'        Wend
+'
+'
+'        'update text number, circle number, and group number of all other pins due to the new inserted row
+'        While Not IsEmpty(Cells(emptyRowNum + 1, 3))
+'            newSerialNum = Cells(Cells(emptyRowNum + 1, 3).Row, 2).Value
+'            ActiveSheet.Shapes("G" & CStr(newSerialNum - 1)).Select
+'            Selection.Name = "G" & CStr(newSerialNum)
+'            ActiveSheet.Shapes("circle" & CStr(newSerialNum - 1)).Select
+'            Selection.Name = "circle" & CStr(newSerialNum)
+'            Selection.ShapeRange.TextFrame2.TextRange.Characters.Text = CStr(newSerialNum)
+'            Selection.ShapeRange.TextFrame2.TextRange.Characters.Font.Name = "Helvetica"
+'            Selection.ShapeRange.TextFrame2.TextRange.Characters.Font.Size = 9
+'            emptyRowNum = emptyRowNum + 1
+'
+'        Wend
+'
+'        'create pin for the current inserted row
+'        Set smallcircle = ActiveSheet.Shapes.AddShape(msoShapeOval, 926.17, 112, 3.5999212598, 3.5999212598)
+'        Set connector = ActiveSheet.Shapes.AddConnector(msoConnectorStraight, 927.75, 115.5922834646, 927.9388976378, 176.062519685)
+'        connector.ConnectorFormat.BeginConnect smallcircle, 5
+'        Set circle_shape = ActiveSheet.Shapes.AddShape(msoShapeOval, 918.891496063, 105.2582677165, 17.8723622047, 17.8749606299)
+'        circle_shape.Name = "circle" & CStr(emptyRowSerialNum)
+'        circle_shape.TextFrame.Characters.Text = CStr(emptyRowSerialNum)
+'        circle_shape.TextFrame.Characters.Font.Size = 9
+'        circle_shape.TextFrame2.TextRange.Font.Name = "Helvetica"
+'        circle_shape.Select
+'        Selection.ShapeRange.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+'        Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+'        Selection.ShapeRange.lockaspectratio = msoTrue
+'        Selection.Locked = msoTrue
+'        ActiveSheet.Shapes.Range(Array(circle_shape.Name, connector.Name, smallcircle.Name)).Select
+'        Selection.ShapeRange.Group.Select
+'        Selection.Name = "G" & CStr(emptyRowSerialNum)
+'        Selection.Placement = xlFreeFloating
+'
+'        Exit Sub
+'    End If
+'
+''    If Target.MergeArea.Cells.Count > 2 Then
+''        'Debug.Print ("Number of mereged cells columns : " & CStr(Target.MergeArea.Columns.Count))
+''        Exit Sub
+''    End If
+'
+'    If Not shapeExists("G" & CStr(rowSerialNum)) Then
+'
+'
+'    'Set smallcircle = ActiveSheet.Shapes.AddShape(msoShapeOval, 891.4285, 104.4156, 3.896, 3.896)
+'    Set smallcircle = ActiveSheet.Shapes.AddShape(msoShapeOval, 926.17, 112, 3.5999212598, 3.5999212598)
+'    'Set connector = ActiveSheet.Shapes.AddConnector(msoConnectorStraight, 892.597, 108.0155, 893.3766, 190.1298)
+'    'Set connector = ActiveSheet.Shapes.AddConnector(msoConnectorStraight, 927.3319685039, 112.9787401575, 927.4467716535, 197.5532283465)
+'    Set connector = ActiveSheet.Shapes.AddConnector(msoConnectorStraight, 927.75, 115.5922834646, 927.9388976378, 176.062519685)
+'    connector.ConnectorFormat.BeginConnect smallcircle, 5
+'    'Set circle_shape = ActiveSheet.Shapes.AddShape(msoShapeOval, 884, 93, 18, 23)
+'    Set circle_shape = ActiveSheet.Shapes.AddShape(msoShapeOval, 918.891496063, 105.2582677165, 17.8723622047, 17.8749606299)
+'
+'    'On Error Resume Next
+'    circle_shape.Name = "circle" & CStr(rowSerialNum)
+'
+'
+'    circle_shape.TextFrame.Characters.Text = CStr(rowSerialNum)
+'    circle_shape.TextFrame.Characters.Font.Size = 9
+'    circle_shape.TextFrame2.TextRange.Font.Name = "Helvetica"
+'    circle_shape.Select
+'    Selection.ShapeRange.TextFrame2.TextRange.ParagraphFormat.Alignment = msoAlignCenter
+'    Selection.ShapeRange.TextFrame2.VerticalAnchor = msoAnchorMiddle
+'    Selection.ShapeRange.lockaspectratio = msoTrue
+'    Selection.Locked = msoTrue
+'    Selection.Placement = xlFreeFloating
+'
+'    ActiveSheet.Shapes.Range(Array(circle_shape.Name, connector.Name, smallcircle.Name)).Select
+'
+'    Selection.ShapeRange.Group.Select
+'    Selection.Name = "G" & CStr(rowSerialNum)
+'    Selection.Placement = xlFreeFloating
+'
+''ErrHandler:
+'
+'
+'    Else
+'        'Debug.Print ("Do nothing as shape should not be created since it was already created")
+'
+'    End If
+'
+'rownum = Target.Row
+''if there is content in the cell of the artwork num (new) column, fill it with the respective artwork num
+'If Len(Range("K" & CStr(rownum)).Value) = 1 Then
+'    Worksheets("AWL").Visible = True
+'    Cells(rownum, 11).Value = "AW-" & Cells(rownum, 5).Value & Cells(rownum, 11).Value
+'End If
+'
+'
+''delete shape group if cell content is backspaced and shape group already exists
+''If Target.Count > 1 Then Exit Sub
+'
+'If Target.Text = "" And shapeExists("G" & CStr(rowSerialNum)) Then
+'ActiveSheet.Shapes.Range(Array("G" & CStr(rowSerialNum))).Select
+'Selection.Delete
+''Debug.Print ("Deleted group shape")
+'End If
+'
+'
+''Application.OnKey "{DELETE}", "AlertUser"
+''Worksheet_Activate
+''End If
+
+'-----START OF auto update awnum if user change code number in code number column---------
+'check if value of any cell changed in code number column
+If Not Intersect(Target, Range("E8:E100")) Is Nothing Then
+currentCodeNum = Target.Value
+'offset to AWnum new column's cell and get value of that multiple aw numbers
+On Error Resume Next:
+awnumoffset = Target.Offset(0, 6).Value
+'Debug.Print ("arr num:" & CStr(awnumoffset))
+'split awnum and store in array
+arrawnumoffset = Split(awnumoffset, Chr(13))
+'count number of artowrk in that cell
+arrawnumoffset_numelements = UBound(arrawnumoffset) - LBound(arrawnumoffset) + 1
+'Debug.Print ("num elements" & CStr(arrawnumoffset_numelements))
+
+        If arrawnumoffset_numelements > 1 Then
+            For j = 0 To arrawnumoffset_numelements - 1
+            If str_awnum = "" Then
+                str_awnum = str_awnum & "AW-" & CStr(currentCodeNum) & CStr(Right(arrawnumoffset(j), 1))
+            Else
+                str_awnum = str_awnum & vbCrLf & "AW-" & CStr(currentCodeNum) & CStr(Right(arrawnumoffset(j), 1))
+            End If
+            Next j
+            Target.Offset(0, 6).Value = str_awnum
+        ElseIf arrawnumoffset_numelements = 1 Then
+            Target.Offset(0, 6).Value = "AW-" & CStr(currentCodeNum) & CStr(Right(awnumoffset, 1))
+
+
+    End If
+End If
+
+
+'----- END OF auto update awnum if user change code number in code number column---------
+
+
+'    If Not Application.Intersect(Target, Range("C" & CStr(Target.Row) & ":" & "N" & CStr(Target.Row))) Is Nothing Then
+'        'Debug.Print("JEEEEEEEEE")
+'        selectionRowSecond = Target.Row
+'        Debug.Print ("selection row second" & CStr(selectionRowSecond))
+'        Debug.Print ("FLAG before swap")
+'            If Not IsEmpty(selectionRowSecond) And storeRowsFirstValue <> selectionRowSecond And numCellsSelected = 12 Then
+'                    Debug.Print ("first rowwww value when swapping: " & CStr(storeRowsFirstValue))
+'                    Debug.Print ("second rowwww value when swapping: " & CStr(selectionRowSecond))
+'                    firstRowSerialNum = Cells(storeRowsFirstValue, 2).Value
+'                    secondRowSerialNum = Cells(selectionRowSecond, 2).Value
+'
+'
+'                    ActiveSheet.Shapes("G" & CStr(firstRowSerialNum)).Select
+'                    Selection.Name = "Gtemp"
+'                    ActiveSheet.Shapes("circle" & CStr(firstRowSerialNum)).Select
+'                    Selection.Name = "circletemp"
+'                    Selection.ShapeRange.TextFrame2.TextRange.Characters.Text = "T"
+'
+'                    ActiveSheet.Shapes("G" & CStr(secondRowSerialNum)).Select
+'                    Selection.Name = "G" & CStr(firstRowSerialNum)
+'                    ActiveSheet.Shapes("circle" & CStr(secondRowSerialNum)).Select
+'                    Selection.Name = "circle" & CStr(firstRowSerialNum)
+'                    Selection.ShapeRange.TextFrame2.TextRange.Characters.Text = CStr(firstRowSerialNum)
+'
+'                    ActiveSheet.Shapes("Gtemp").Select
+'                    Selection.Name = "G" & CStr(secondRowSerialNum)
+'                    ActiveSheet.Shapes("circletemp").Select
+'                    Selection.Name = "circle" & CStr(secondRowSerialNum)
+'                    Selection.ShapeRange.TextFrame2.TextRange.Characters.Text = CStr(secondRowSerialNum)
+'
+'
+'                    Debug.Print ("SWAPPED...")
+'                    'selectionRowSecond = Null
+'                    'selectionRowFirst = " "
+'            End If
+'
+'    End If
+
+    
+'Application.ScreenUpdating = True
+End Sub
+
+Private Sub Worksheet_BeforeDoubleClick(ByVal Target As Range, Cancel As Boolean)
+Application.ScreenUpdating = False
+
+'avoid error when trying to type in a merged cell when inserting a row that merges cells across entire sheet
+If Target.Column = 3 Then
+    Exit Sub
+End If
+
+
+If Not Application.Intersect(Target, Range("K8:K100")) Is Nothing Then
+    If Target.Offset(0, -6) <> "" Then
+        Cancel = True
+        UserForm2.Show False
+    End If
+End If
+
+If Not Application.Intersect(Target, Range("K6: L7")) Is Nothing Then
+
+        YNanswer = MsgBox("Generate Artwork List?", vbYesNo, "Generate AWL")
+        
+        If YNanswer = vbYes Then
+            
+            generateAWListByDoubleClick
+        Else
+            'do nothing
+        End If
+End If
+
+
+Application.ScreenUpdating = True
+End Sub
+
+'Private Sub Workbook_Open()
+'    Application.OnKey "{DELETE}", "deleteGroup"
+'End Sub
+
+'Private Sub Worksheet_Activate()
+'Application.OnKey Key = "{DELETE}", Procedure = "AlertUser"
+'End Sub
+Public Sub deleteGroup()
+'Debug.Print ("Entered delete sub")
+ActiveSheet.Shapes.Range(Array("G" & CStr(rowSerialNum))).Select
+Selection.Delete
+'Debug.Print ("Deleted group shape using delete key")
+End Sub
+Private Sub Worksheet_SelectionChange(ByVal Target As Range)
+Application.ScreenUpdating = False
+'If Application.CutCopyMode = xlCopy Or _
+'Application.CutCopyMode = xlCut Then
+'
+'While Application.CutCopyMode = xlCopy Or _
+'Application.CutCopyMode = xlCut
+'Application.EnableEvents = False
+'DoEvents
+'Application.EnableEvents = True
+''DisableBanding
+''SendKeys "{ESC}"
+'
+'Debug.Print ("IN LOOP")
+'Wend
+'End If
+
+'Application.ScreenUpdating = False
+
+''Application.ScreenUpdating = True
+''On Error Resume Next:
+''        Dim selectionString As Variant
+''        selectionString = Selection.Address
+''        Debug.Print ("SELECTION  STRING:  " & CStr(selectionString))
+''
+'        Dim myRange As Range
+'        On Error Resume Next
+'        Set myRange = Selection
+'        selectionRowFirst = myRange.Row
+'        numCellsSelected = Target.Count
+'        Debug.Print ("selection row first: " & CStr(selectionRowFirst))
+'        'Debug.Print ("Num cells selected: " & CStr(numCellsSelected))
+'        Static storerowsarray() As Variant
+'
+'        If numCellsSelected = 12 Then
+'
+'
+'
+'                'countIndex = 0
+'                'nextindex = numElements
+'                'While (countIndex < 1)
+'                numElements = UBound(storerowsarray) - LBound(storerowsarray) + 1
+'                Debug.Print ("num elements:" & CStr(numElements))
+'
+'                If IsEmpty(numElements) Then
+'                    Debug.Print ("num elements forceddd to 1")
+'                    numElements = 1
+'                End If
+'
+'                ReDim Preserve storerowsarray(numElements)
+'                storerowsarray(countIndex) = selectionRowFirst
+'                'Debug.Print ("ARRAYY INDEX VALUE = " & CStr(storerowsarray(nextindex)))
+'                countIndex = countIndex + 1
+'                Debug.Print ("COUNT INDEX = " & CStr(countIndex))
+'                'Wend
+'
+'            Debug.Print ("array index 0 value : " & CStr(storerowsarray(0)))
+'
+'        End If
+'
+'                If countIndex = 2 Then
+'                Erase storerowsarray()
+'                countIndex = 0
+'                End If
+''
+''
+''
+''
+''            'SendKeys "{ESC}"
+''            'pinsnums = swapRowPins(selectionRowFirst, selectionRowSecond)
+'
+
+
+'
+''        If Not Application.Intersect(Target, Range("C" & CStr(Target.Row) & ":" & "N" & CStr(Target.Row))) Is Nothing Then
+''            Debug.Print ("Targetcount:" & CStr(Target.Count))
+''
+''            numCellsSelected = Target.Count
+''
+''                firstRowNum = Target.Row
+''                Debug.Print ("first row num" & CStr(firstRowNum))
+''
+''
+''        End If
+        
+        
+'Dim rowSerialNum As Variant
+'Clear fill colors, no colour code = xlNone
+Range("B6:N35").Interior.Color = RGB(230, 230, 230)
+
+'Highlight step.
+If Not Application.Intersect(Target, Range("B8:N35")) Is Nothing Then
+
+    'Highlight row.
+    With Range(Cells(ActiveCell.Row, 2), Cells(ActiveCell.Row, 14)).Interior
+        
+        .Color = RGB(240, 250, 200)
+    
+    End With
+    
+    'Highlight header.
+    With Range(Cells(6, ActiveCell.Column), Cells(7, ActiveCell.Column)).Interior
+        
+        .Color = RGB(240, 250, 200)
+    'force artwork number cell to grey
+    Range("K6").Interior.Color = RGB(217, 217, 217)
+    
+    End With
+    
+    
+    ''------------Light up respective pin label number----------------
+    
+    rowSerialNum = Cells(ActiveCell.Row, 4).Value
+    
+    'ActiveSheet.Shapes.Interior.Color = RGB(255, 255, 255)
+    
+    'Application.ScreenUpdating = True
+    ActiveSheet.Shapes.SelectAll
+    'Application.ScreenUpdating = False
+    Selection.ShapeRange.Fill.ForeColor.RGB = RGB(255, 255, 255)
+    
+    'unselect all by simulating an escape key pressed
+    SendKeys "{ESC}"
+    'DoEvents
+    'Debug.Print ("Row serial num of selection is")
+    'Debug.Print rowSerialNum
+   
+    
+    
+    'need error handler to handle case whereby user click on an empty row without any pins
+    On Error GoTo ErrHandler:
+
+    ActiveSheet.Shapes("circle" & CStr(rowSerialNum)).Fill.ForeColor.RGB = RGB(240, 250, 200)
+    
+ErrHandler:
+     'Debug.Print ("label value does not exist")
+    'Resume Next
+   'Debug.Print Activecell.Column
+
+
+
+End If
+'
+'            'Dim myRange As Range
+'            'On Error Resume Next
+'            'Set myRange = Selection
+'            numCellsSelected = Target.Count
+'            Static storerowsarray(1) As Variant
+'
+'
+'            If numCellsSelected = 12 Then
+'
+'                If Not IsEmpty(storerowsarray(0)) And Not IsEmpty(storerowsarray(1)) Then
+'                    Erase storerowsarray()
+'                    Debug.Print ("first index should be empty: " & CStr(storerowsarray(0)))
+'                    Debug.Print ("second index should also be empty: " & CStr(storerowsarray(1)))
+'
+'                End If
+'
+'
+'
+'                If IsEmpty(storerowsarray(0)) Then
+'                    'selectionRowFirst = myRange.Row
+'                    selectionRowFirst = Target.Row
+'                    storerowsarray(0) = selectionRowFirst
+'                    storeRowsFirstValue = storerowsarray(0)
+'                    Debug.Print ("array index 0 value : " & CStr(storerowsarray(0)))
+'                    Debug.Print ("array index 1 value: " & CStr(storerowsarray(1)))
+'
+'                ElseIf Not IsEmpty(storerowsarray(0)) Then
+'                    storerowsarray(1) = selectionRowFirst
+'
+'                    Debug.Print ("elseif 0 : " & CStr(storerowsarray(0)))
+'                    Debug.Print ("elseif 1: " & CStr(storerowsarray(1)))
+'
+'                End If
+'
+'            End If
+
+
+'Application.ScreenUpdating = True
+
+End Sub
+
+
+
+Function shapeExists(shapeName As String) As Boolean
+' returns TRUE if a shape named [shapeName] exists on the active worksheet
+    'Debug.Print ("entered shapeExists function")
+    Dim Sh As Shape
+    For Each Sh In ActiveSheet.Shapes
+        If Sh.Name = shapeName Then shapeExists = True
+        
+    Next Sh
+End Function
+
+
+
+
