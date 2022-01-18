@@ -1,0 +1,688 @@
+Private Sub saveAWLToNewWb_Click()
+    
+    Application.ScreenUpdating = False
+    Set productNameCell = Worksheets("AWLtest").Range("B:B").Find(what:="PRODUCT")
+    codeNoCellValue = productNameCell.Offset(2, 11).Value
+    titlenewawl = "AL-" & CStr(codeNoCellValue)
+    ActiveWorkbook.Sheets("AWLtest").Visible = False
+    ActiveWorkbook.Save
+    'ThisWorkbook.Sheets("AWLtest").Copy
+    
+
+    fileSaveNameAWL = Application.GetSaveAsFilename(InitialFileName:=titlenewawl, _
+    FileFilter:="Excel Macro Enabled Workbook (*.xlsm), *.xlsm)")
+    
+    If fileSaveNameAWL = False Then
+        Exit Sub
+    End If
+    
+    Sheets("AWLtest").Visible = False
+    Application.ScreenUpdating = True
+    ActiveWorkbook.SaveAs Filename:=fileSaveNameAWL, FileFormat:=xlOpenXMLWorkbookMacroEnabled
+    ActiveWorkbook.Sheets("AWLtest").Visible = True
+    ActiveWorkbook.Sheets("AWLtest").Range("X:AI").EntireColumn.Hidden = True
+    
+    ActiveWorkbook.Sheets("DR").Visible = False
+    ActiveWorkbook.Sheets("DESIGN SPECIFICATIONS").Visible = False
+    ActiveWorkbook.Sheets("CONCEPT MODEL PHOTO").Visible = False
+    
+    
+    ActiveWorkbook.Save
+    'ActiveWorkbook.Close
+  
+End Sub
+
+Private Sub WorkSheet_Change(ByVal Target As Range)
+
+If Intersect(Target, Range("B4:S" & CStr(Range("C1000").End(xlUp).Offset(7, 0).Row))) Is Nothing Then Exit Sub
+
+
+If Not Intersect(Target, Range("H5:S" & CStr(Range("D2000").End(xlUp).Offset(7, 15).Row))) Is Nothing Then
+
+    Target.NumberFormat = "yyyy.mm.dd"
+    'Dim max_date As Date
+    max_date = Application.WorksheetFunction.Max(Worksheets("AWLtest").Range("H5:S" & CStr(Range("D2000").End(xlUp).Offset(7, 15).Row)))
+    
+    Set productNameCell = Worksheets("AWLtest").Range("B:B").Find(what:="PRODUCT")
+    productNameCell.Offset(1, 13).Value = max_date
+    productNameCell.Offset(1, 13).NumberFormat = "yyyy.mm.dd"
+   
+    
+End If
+
+'For i = 5 To 2000 Step 1
+'    If Not IsEmpty(Range("D" & CStr(i)).Value) Then
+
+'    awnumi = Range("D" & CStr(i)).Value
+
+'    arrawnumi = Split(awnumi, "-")
+'
+'        If Not IsEmpty(Range("D" & CStr(i + 1)).Value) Then
+
+'        awnumii = Range("D" & CStr(i + 1)).Value
+
+'        arrawnumii = Split(awnumi, "-")
+'        Debug.Print "i "; arrawnumi(1)
+'        Debug.Print "ii "; arrawnumii(1)
+'
+'            If StrComp(CStr(arrawnumi(1)), CStr(arrawnumii(1)), vbTextCompare) = 0 Then
+'            Debug.Print "entered"
+'            Worksheets("AWLtest").Range("C" & CStr(i) & ":S" & CStr(i)).Interior.Color = RGB(250, 250, 250)
+'            End If
+'
+'        End If
+'
+'    End If
+'Next i
+
+
+'---update code number cell with latest number of revisions
+Static datearray() As Variant
+
+
+If Not Intersect(Target, Range("H5:S" & CStr(Range("D2000").End(xlUp).Row))) Is Nothing Then
+
+'store all unique values in array includ target, then count no. of eleemtns - 1 to get countdate
+ReDim datearray(0)
+
+For rowawl = 5 To Range("D2000").End(xlUp).Row Step 1
+    For colawl = 8 To 19 Step 1
+        If Not IsEmpty(Cells(rowawl, colawl).Value) Then
+            If Not IsInArray(Cells(rowawl, colawl).Value, datearray) Then
+            
+                noofelements = UBound(datearray) - LBound(datearray) + 1
+                'Debug.Print "element "; noofelements
+                nxtindex = noofelements - 1
+                'Debug.Print "nxtindex: "; nxtindex
+                
+                ReDim Preserve datearray(noofelements)
+                datearray(nxtindex) = Cells(rowawl, colawl).Value
+                
+            End If
+        End If
+    Next colawl
+Next rowawl
+
+'update countdate into the cell
+Set productNameHeaderCell = Worksheets("AWLtest").Range("B:B").Find(what:="PRODUCT")
+    'if version <10 then add a -0 in front
+    If noofelements < 10 Then
+    productNameHeaderCell.Offset(2, 11).Value = "AW-" & CStr(productNameHeaderCell.Offset(1, 0).Value) & "-0" & CStr(noofelements - 1)
+    Else
+    productNameHeaderCell.Offset(2, 11).Value = "AW-" & CStr(productNameHeaderCell.Offset(1, 0).Value) & "-" & CStr(noofelements - 1)
+    End If
+End If
+
+
+End Sub
+''colors a cell grey when double clicked and toggles when double clicked again
+Private Sub Worksheet_BeforeDoubleClick(ByVal Target As Range, Cancel As Boolean)
+
+'---------------------------shade columns EFG--------------------------------------------
+Dim targetarr(400)
+
+If Not Intersect(Target, Range("E5:G" & CStr(Range("D2000").End(xlUp).Offset(7, 3).Row))) Is Nothing Then
+
+Cancel = True
+
+targetarr(j) = Target.Address(False, False)
+belowtarget = Target.Row + 1
+
+   With Range(targetarr(j)).Interior
+        If .Color = RGB(240, 250, 200) Or _
+            .Color = RGB(250, 250, 250) Or _
+            .Color = RGB(217, 217, 217) Then
+           Range(targetarr(j)).Interior.Color = RGB(128, 128, 128)
+            
+        ElseIf .Color = RGB(128, 128, 128) Then
+        
+            If IsEmpty(Cells(Target.Row, 4).Value) Then
+                Range(targetarr(j)).Interior.Color = RGB(255, 255, 255)
+            ElseIf Not IsEmpty(Cells(Target.Row, 4).Value) Then
+                If Not IsEmpty(Cells(belowtarget, 4)) Then
+                    Range(targetarr(j)).Interior.Color = RGB(255, 255, 255)
+                Else:
+                    Range(targetarr(j)).Interior.Color = RGB(217, 217, 217)
+                End If
+            End If
+            
+        End If
+    End With
+
+
+End If
+
+
+
+
+
+'--------------------create ACN from code no. -------------------------------------------------------
+Dim targetcell As Range
+
+If Not Intersect(Target, Range("D5:D" & CStr(Range("D500").End(xlUp).Row))) Is Nothing Then
+    
+'    Sheets("ACN").Visible = True
+'    Sheets("A4 Template 00").Visible = True
+'    Sheets("A3 Template 00").Visible = True
+'    Sheets("A3 Template").Visible = True
+'    Sheets("A4 Template").Visible = True
+'    Sheets("DESIGN SPECIFICATIONS").Visible = True
+'
+    activerow = ActiveCell.Row
+    Debug.Print ("ACTIVEROW = " & CStr(activerow))
+    'if the cell clicked is the one with revision
+    If Right(Range("D" & CStr(activerow)), 1) <> 0 And IsEmpty(Range("D" & CStr(activerow)).Value) = False Then
+    Application.ScreenUpdating = False
+'    Sheets("ACN").Visible = True
+'    Sheets("DESIGN SPECIFICATIONS").Visible = True
+'    Sheets("A4 Template").Visible = True
+'    Sheets("A3 Template").Visible = True
+    awnumnon00 = ActiveCell.Value
+    Cancel = True
+        YNanswer = MsgBox("Generate ACN?", vbYesNo, "Generate ACN")
+        
+        If YNanswer = vbYes Then
+        
+                'unhide all worksheet
+                Dim WS As Worksheet
+    
+                For Each WS In Worksheets
+                    WS.Visible = True
+                Next
+                
+                
+        Select Case Right(Range("D" & CStr(activerow)), 1)
+            Case 1
+                h = 1
+            Case 2
+                h = 2
+            Case 3
+                h = 3
+            Case 4
+                h = 4
+            Case 5
+                h = 5
+            Case 6
+                h = 6
+            Case 7
+                h = 7
+        End Select
+        
+        'copies('creates') a new blank ACN sheet
+        Sheets("ACN").Copy After:=Sheets(Sheets.Count)
+        
+        m = 0
+        For Each s In ActiveWorkbook.Sheets
+            If s.Visible Then m = m + 1
+        Next s
+        
+        
+        partnamerow = activerow - h
+        If IsEmpty(Sheets("AWLtest").Range("B" & CStr(partnamerow)).Value) Then
+               partname = Sheets("AWLtest").Range("B" & CStr(partnamerow)).End(xlUp).Value
+        Else
+               partname = Sheets("AWLtest").Range("B" & CStr(partnamerow)).Value
+        End If
+               
+        'Sheets(m).Name = "ACN-" & Sheets("AWLtest").Range("D" & CStr(activerow)).Value & "-" & partname
+        'Sheets(m).Name = Replace(Sheets(m).Name, " ", "_")
+            
+        'Debug.Print "part name"; partname
+        
+        Sheets(m).Range("D2").Value = Worksheets("DESIGN SPECIFICATIONS").Range("D4").Value
+        
+        
+        Sheets(m).Range("D3").Value = partname
+        Sheets(m).Range("D4").Value = Sheets("AWLtest").Range("D" & CStr(activerow)).Value
+    
+        For i = 4 To 15 Step 1
+            If Not IsEmpty(Cells(activerow, 4).Offset(0, i).Value) Then
+                ACNAWdate = Cells(activerow, 4).Offset(0, i).Value
+            End If
+        Next i
+        
+        
+        Sheets(m).Range("D5").Value = ACNAWdate
+        Sheets(m).Range("D5").NumberFormat = "yyyy.mm.dd"
+        
+                '----label respective issue sections with circle
+    '----Note: SPH taken as cell F35 on ACN sheet, SIC taken as cell F36 on ACN sheet for now as unsure which is which
+    smallCircleIssueSec = Sheets(m).Range("F34").Value
+    'SIC
+    If Not IsEmpty(Worksheets("AWLtest").Range("H" & CStr(activerow))) Or Not IsEmpty(Worksheets("AWLtest").Range("I" & CStr(activerow))) Then
+        'Debug.Print ("SIC")
+        
+        Sheets(m).Range("F36").Value = Left(smallCircleIssueSec, 1)
+        
+    End If
+    'SSF
+    If Not IsEmpty(Worksheets("AWLtest").Range("J" & CStr(activerow))) Or Not IsEmpty(Worksheets("AWLtest").Range("K" & CStr(activerow))) Then
+    'Debug.Print ("SSF")
+        Sheets(m).Range("F37").Value = Left(smallCircleIssueSec, 1)
+
+    End If
+    'SPL
+    If Not IsEmpty(Worksheets("AWLtest").Range("L" & CStr(activerow))) Or Not IsEmpty(Worksheets("AWLtest").Range("M" & CStr(activerow))) Then
+        'Debug.Print ("SPL")
+        Sheets(m).Range("F38").Value = Left(smallCircleIssueSec, 1)
+    End If
+    'SCM
+    If Not IsEmpty(Worksheets("AWLtest").Range("N" & CStr(activerow))) Or Not IsEmpty(Worksheets("AWLtest").Range("O" & CStr(activerow))) Then
+        'Debug.Print ("SCM")
+        Sheets(m).Range("F39").Value = Left(smallCircleIssueSec, 1)
+    End If
+    'SKC
+    If Not IsEmpty(Worksheets("AWLtest").Range("P" & CStr(activerow))) Then
+        'Debug.Print ("SKC")
+        Sheets(m).Range("F40").Value = Left(smallCircleIssueSec, 1)
+    End If
+    'STJ
+    If Not IsEmpty(Worksheets("AWLtest").Range("Q" & CStr(activerow))) Then
+        'Debug.Print ("STJ")
+        Sheets(m).Range("F42").Value = Left(smallCircleIssueSec, 1)
+    End If
+    'SCRS
+    If Not IsEmpty(Worksheets("AWLtest").Range("R" & CStr(activerow))) Then
+        'Debug.Print ("SCRS")
+        Sheets(m).Range("F41").Value = Left(smallCircleIssueSec, 1)
+    End If
+    'SPH
+    If Not IsEmpty(Worksheets("AWLtest").Range("S" & CStr(activerow))) Then
+        'Debug.Print ("SPH")
+        Sheets(m).Range("F35").Value = Left(smallCircleIssueSec, 1)
+    End If
+'--------end of label respective issue sections with circle
+'-------label approvedby then designed by person on new ACN sheet
+    With Sheets("AWLtest").Range("B:B")
+    Set product_name_cell2 = .Find(what:="PRODUCT")
+    Set approvalPersonCellOffset = product_name_cell2.Offset(1, 9)
+    End With
+'Sheets(m).Range("I35").Value = approvalPersonCellOffset.Value
+Sheets(m).Range("G35").Value = Sheets("DESIGN SPECIFICATIONS").Range("O2").Value
+Sheets(m).Range("G35:I37").HorizontalAlignment = xlCenter
+Sheets(m).Range("G35:I37").VerticalAlignment = xlCenter
+Sheets(m).Range("G35:I37").Font.Name = "Helvetica"
+Sheets(m).Range("G35:I37").Font.Size = 10
+'----------------end of label designed,checkedby,approvedby person on new ACN sheet
+    'create a new WB to store the new ACN sheet with information
+        
+
+        'ActiveWorkbook.SaveAs "U:\User\Common\New R&D folder created 100405\05.  Common sharing folder\Anthony\Lek Jie Kai _Working copy\" & newacnname, FileFormat:=xlOpenXMLWorkbookMacroEnabled
+'----------------------------make new ACN list grey when revision----------------------------------------
+serialnum = Right(ActiveSheet.Range("D4").Value, 1)
+
+If serialnum <> 0 Then
+With ActiveSheet.Range("B:B")
+    Set sncell = .Find(what:=serialnum)
+    snrow = sncell.Row
+    'Debug.Print "snrow"; snrow
+    ActiveSheet.Range("B" & CStr(snrow) & ":I" & CStr(snrow + 1)).Interior.Color = RGB(217, 217, 217)
+    'Range(cstr(sncell.address(false, false)) & ":I" & CStr(snrow)).Interior.Color = RGB(217, 217, 217)
+End With
+
+Else
+    ActiveSheet.Range("B34:I35").Interior.Color = RGB(217, 217, 217)
+    
+End If
+        
+        
+        
+        
+    '------START of add a # number behind the file name to guide user which part name it belongs to
+    CDSawnum = Left(awnumnon00, Len(awnumnon00) - 3)
+    Debug.Print "CDSAWnum"; CDSawnum
+
+    Set awCell = Worksheets("DESIGN SPECIFICATIONS").Range("K:L").Find(what:=CDSawnum)
+    
+        If Not awCell Is Nothing Then
+            'Debug.Print "awyes"
+            'Debug.Print "awcell"; awCell
+            
+            firstadd = awCell.Address(False, False)
+            'Debug.Print "firstadd "; firstadd
+            
+            If awCell.Column = 11 Then
+            sncell = Worksheets("DESIGN SPECIFICATIONS").Range(CStr(firstadd)).Offset(0, -9).Value
+            
+            ElseIf awCell.Column = 12 Then
+            sncell = Worksheets("DESIGN SPECIFICATIONS").Range(CStr(firstadd)).Offset(0, -10).Value
+            End If
+            
+        End If
+        
+    'Sheets(m).Name = "ACN-" & awnumnon00 & " " & "#" & sncell
+    Sheets(m).Name = "ACN-" & awnumnon00 & " " & "XXXXXX"
+    '------END of add a # number behind the file name to guide user which part name it belongs to
+        newacnname = Sheets(m).Name
+        'ThisWorkbook.Sheets(m).Copy
+
+        ThisWorkbook.Sheets(Array("DESIGN SPECIFICATIONS", "A4 Template", "A3 Template", m)).Select
+        'ThisWorkbook.Sheets(m).Activate
+        ThisWorkbook.Sheets(Array("DESIGN SPECIFICATIONS", "A4 Template", "A3 Template", m)).Copy
+        ThisWorkbook.Sheets(newacnname).Delete
+        ThisWorkbook.Sheets("ACN").Visible = False
+        ThisWorkbook.Sheets("DESIGN SPECIFICATIONS").Visible = False
+        ThisWorkbook.Sheets("A4 Template").Visible = False
+        ThisWorkbook.Sheets("A3 Template").Visible = False
+        ThisWorkbook.Sheets("A4 Template 00").Visible = False
+        ThisWorkbook.Sheets("A3 Template 00").Visible = False
+        ThisWorkbook.Sheets("DR").Visible = False
+        ThisWorkbook.Sheets("CONCEPT MODEL PHOTO").Visible = False
+        
+        fileSaveNameACN = Application.GetSaveAsFilename(InitialFileName:=newacnname, _
+        FileFilter:="Excel Macro Enabled Workbook (*.xlsm), *.xlsm)")
+        If fileSaveNameACN <> False Then
+            'Debug.Print ("filesavenameACN is false")
+            
+        'Debug.Print ("filsavenameACN is true")
+        'ActiveWorkbook.Sheets(Array("A4 Template", "A3 Template")).Visible = False
+        ActiveWorkbook.Sheets(newacnname).Move Before:=ActiveWorkbook.Worksheets(1)
+        ActiveWorkbook.SaveAs Filename:=fileSaveNameACN, FileFormat:=xlOpenXMLWorkbookMacroEnabled
+        
+        ActiveWorkbook.Sheets(Array("DESIGN SPECIFICATIONS", "A4 Template", "A3 Template")).Visible = False
+        ActiveWorkbook.Save
+        
+        Application.DisplayAlerts = False
+        'ActiveWorkbook.Close
+        
+        
+        'ActiveWorkbook.Sheets(newacnname).Delete
+        Application.DisplayAlerts = True
+        
+        'hide sheets in original AWL workbook
+'        ActiveWorkbook.Sheets("DR").Visible = False
+'        ActiveWorkbook.Sheets("DESIGN SPECIFICATIONS").Visible = False
+'        ActiveWorkbook.Sheets("ACN").Visible = False
+'        ActiveWorkbook.Sheets("A4 Template").Visible = False
+'        ActiveWorkbook.Sheets("A3 Template").Visible = False
+'        ActiveWorkbook.Sheets("A4 Template 00").Visible = False
+'        ActiveWorkbook.Sheets("A3 Template 00").Visible = False
+'        ActiveWorkbook.Sheets("CONCEPT MODEL PHOTO").Visible = False
+        
+    
+        'delete the newly created ACN sheet from this master workbook
+        
+        Else
+        Application.DisplayAlerts = False
+        ActiveWorkbook.Close
+        
+        ActiveWorkbook.Sheets(newacnname).Delete
+        Application.DisplayAlerts = True
+        'hide sheets in original AWL workbook
+        ActiveWorkbook.Sheets("DR").Visible = False
+        ActiveWorkbook.Sheets("DESIGN SPECIFICATIONS").Visible = False
+        ActiveWorkbook.Sheets("ACN").Visible = False
+        ActiveWorkbook.Sheets("A4 Template").Visible = False
+        ActiveWorkbook.Sheets("A3 Template").Visible = False
+        ActiveWorkbook.Sheets("A4 Template 00").Visible = False
+        ActiveWorkbook.Sheets("A3 Template 00").Visible = False
+        ActiveWorkbook.Sheets("CONCEPT MODEL PHOTO").Visible = False
+        End If
+        
+        Application.ScreenUpdating = True
+        End If
+
+    
+    '---------if double click on cell with -00 (NOOOOOO ACN version ==> generate A3 or A4 AW template straight and save it to a new pdf file)
+    ElseIf Right(Range("D" & CStr(activerow)), 1) = 0 Then
+    'Sheets("A4 Template 00").Visible = True
+    'Sheets("A3 Template 00").Visible = True
+    'Cancel = False
+    Cancel = True
+
+    activecelladdress = ActiveCell.Address
+    
+    activecelladdressarray = Split(activecelladdress, "$")
+    activecelladdressvalue = activecelladdressarray(1) & activecelladdressarray(2)
+    
+    
+    'Debug.Print ("HYELLO" & CStr(activecelladdressvalue))
+    awnum00 = ActiveCell.Value
+    
+        'get date from AWL and assign to global variable
+        For i = 4 To 15 Step 1
+            If Not IsEmpty(Cells(activerow, 4).Offset(0, i).Value) Then
+                AWdate = Cells(activerow, 4).Offset(0, i).Value
+            End If
+        Next i
+        
+    UserForm1.Show False
+    
+    
+    ElseIf IsEmpty(Range("D" & CStr(activerow)).Value) Then
+    Cancel = False
+    
+    End If
+    
+    
+    'after double clicking in AWL to generate ACN or AW template, hide sheets so that AWList file only has ONE sheet which is the AWL
+'    Sheets("ACN").Visible = False
+'    Sheets("A4 Template 00").Visible = False
+'    Sheets("A3 Template 00").Visible = False
+'    Sheets("A3 Template").Visible = False
+'    Sheets("A4 Template").Visible = False
+'    Sheets("DESIGN SPECIFICATIONS").Visible = False
+End If
+
+
+
+
+Range("B1:S2").Interior.Color = xlNone
+            
+
+
+End Sub
+
+Private Sub Worksheet_SelectionChange(ByVal Target As Range)
+
+    
+
+'-----------------------------------color when selecting---------------------------------
+If Not Intersect(Target, Range("C5:S" & CStr(Range("C2000").End(xlUp).Offset(8, 0).Row))) Is Nothing Then
+Range("B4:S4").Interior.Color = xlNone
+
+'-------------------------------------Highlight header---------------------------------
+    With Cells(4, ActiveCell.Column).Interior
+        
+        .Color = RGB(240, 250, 200)
+    
+    End With
+
+
+'--------------------------------making top rows white when new row is added ------------------------
+
+
+For i = 5 To Range("C2000").End(xlUp).Offset(7, 0).Row
+    
+    If IsEmpty(Range("D" & CStr(i)).Value) Then
+    Range("C" & CStr(i) & ":S" & CStr(i)).Interior.Color = xlNone
+
+    ElseIf Not IsEmpty(Range("D" & CStr(i)).Value) Then
+    awnumi = Range("D" & CStr(i)).Value
+    arrawnumi = Split(awnumi, "-")
+    Union(Range("C" & CStr(i) & ":D" & CStr(i)), Range("H" & CStr(i) & ":S" & CStr(i))).Interior.Color _
+    = RGB(217, 217, 217)
+    
+    If Range("E" & CStr(i)).Interior.Color = RGB(128, 128, 128) Then
+                 Worksheets("AWLtest").Range("E" & CStr(i)).Interior.Color = RGB(128, 128, 128)
+            Else: Range("E" & CStr(i)).Interior.Color = RGB(217, 217, 217)
+            End If
+
+            If Range("F" & CStr(i)).Interior.Color = RGB(128, 128, 128) Then
+                Worksheets("AWLtest").Range("F" & CStr(i)).Interior.Color = RGB(128, 128, 128)
+            Else: Range("F" & CStr(i)).Interior.Color = RGB(217, 217, 217)
+            End If
+
+            If Range("G" & CStr(i)).Interior.Color = RGB(128, 128, 128) Then
+                Worksheets("AWLtest").Range("G" & CStr(i)).Interior.Color = RGB(128, 128, 128)
+            Else: Range("G" & CStr(i)).Interior.Color = RGB(217, 217, 217)
+            End If
+    
+   
+        If Not IsEmpty(Range("D" & CStr(i + 1)).Value) Then
+        awnumii = Range("D" & CStr(i + 1)).Value
+        arrawnumii = Split(awnumi, "-")
+            
+            If StrComp(CStr(arrawnumi(1)), CStr(arrawnumii(1)), vbTextCompare) = 0 Then
+            
+            Union(Range("C" & CStr(i) & ":D" & CStr(i)), Range("H" & CStr(i) & ":S" & CStr(i))).Interior.Color = xlNone
+            
+            If Range("E" & CStr(i)).Interior.Color = RGB(128, 128, 128) Then
+                 Worksheets("AWLtest").Range("E" & CStr(i)).Interior.Color = RGB(128, 128, 128)
+            Else: Range("E" & CStr(i)).Interior.Color = xlNone
+            End If
+
+            If Range("F" & CStr(i)).Interior.Color = RGB(128, 128, 128) Then
+                Worksheets("AWLtest").Range("F" & CStr(i)).Interior.Color = RGB(128, 128, 128)
+            Else: Range("F" & CStr(i)).Interior.Color = xlNone
+            End If
+
+           If Range("G" & CStr(i)).Interior.Color = RGB(128, 128, 128) Then
+                Worksheets("AWLtest").Range("G" & CStr(i)).Interior.Color = RGB(128, 128, 128)
+            Else: Range("G" & CStr(i)).Interior.Color = xlNone
+            End If
+
+
+           Range("C" & CStr(i + 1) & ":D" & CStr(i + 1)).Interior.Color = RGB(217, 217, 217)
+            Range("H" & CStr(i + 1) & ":S" & CStr(i + 1)).Interior.Color = RGB(217, 217, 217)
+            
+            If Range("E" & CStr(i + 1)).Interior.Color = RGB(128, 128, 128) Then
+                Worksheets("AWLtest").Range("E" & CStr(i + 1)).Interior.Color = RGB(128, 128, 128)
+            Else: Range("E" & CStr(i + 1)).Interior.Color = RGB(217, 217, 217)
+            End If
+            
+            If Range("F" & CStr(i + 1)).Interior.Color = RGB(128, 128, 128) Then
+                Worksheets("AWLtest").Range("F" & CStr(i + 1)).Interior.Color = RGB(128, 128, 128)
+            Else: Range("F" & CStr(i + 1)).Interior.Color = RGB(217, 217, 217)
+            End If
+            
+            If Range("G" & CStr(i + 1)).Interior.Color = RGB(128, 128, 128) Then
+                Worksheets("AWLtest").Range("G" & CStr(i + 1)).Interior.Color = RGB(128, 128, 128)
+            Else: Range("G" & CStr(i + 1)).Interior.Color = RGB(217, 217, 217)
+            End If
+            
+'            If Range("E" & CStr(i + 1)).Interior.Color = RGB(128, 128, 128) Then
+'                 Worksheets("AWLtest").Range("E" & CStr(i)).Interior.Color = RGB(128, 128, 128)
+'            Else: Range("E" & CStr(i)).Interior.Color = RGB(217, 217, 217)
+'            End If
+'
+'            If Range("F" & CStr(i + 1)).Interior.Color = RGB(128, 128, 128) Then
+'                Worksheets("AWLtest").Range("F" & CStr(i)).Interior.Color = RGB(128, 128, 128)
+'            Else: Range("F" & CStr(i)).Interior.Color = RGB(217, 217, 217)
+'            End If
+'
+'            If Range("G" & CStr(i + 1)).Interior.Color = RGB(128, 128, 128) Then
+'                Worksheets("AWLtest").Range("G" & CStr(i)).Interior.Color = RGB(128, 128, 128)
+'            Else: Range("G" & CStr(i)).Interior.Color = RGB(217, 217, 217)
+'            End If
+            
+            
+            End If
+            
+        End If
+        
+    End If
+
+
+Next i
+
+End If
+
+
+
+If Not Application.Intersect(Target, Range("C5:" & "S" & CStr(Range("C2000").End(xlUp).Offset(7, 0).Row))) Is Nothing Then
+    
+    With Range(Cells(ActiveCell.Row, 3), Cells(ActiveCell.Row, 4)).Interior
+        .Color = RGB(240, 250, 200)
+    End With
+    
+    With Range(Cells(ActiveCell.Row, 8), Cells(ActiveCell.Row, 19)).Interior
+        .Color = RGB(240, 250, 200)
+    End With
+    
+    With Cells(ActiveCell.Row, 5).Interior
+        If Cells(ActiveCell.Row, 5).Interior.Color = RGB(128, 128, 128) Then
+        .Color = RGB(128, 128, 128)
+        Else: .Color = RGB(240, 250, 200)
+        End If
+    End With
+
+    With Cells(ActiveCell.Row, 6).Interior
+        If Cells(ActiveCell.Row, 6).Interior.Color = RGB(128, 128, 128) Then
+        .Color = RGB(128, 128, 128)
+        Else: .Color = RGB(240, 250, 200)
+        End If
+    End With
+    
+    With Cells(ActiveCell.Row, 7).Interior
+        If Cells(ActiveCell.Row, 7).Interior.Color = RGB(128, 128, 128) Then
+        .Color = RGB(128, 128, 128)
+        Else: .Color = RGB(240, 250, 200)
+        End If
+    End With
+
+
+
+End If
+
+'----------indicate display messages to user that he can double click to generate AW (for -00) or ACN(for 01 and above versions)
+
+If Not Application.Intersect(Target, Range("D5:" & "D" & CStr(Range("D2000").End(xlUp).Offset(-3, 0).Row))) Is Nothing Then
+For n = 5 To Range("D2000").End(xlUp).Offset(-3, 0).Row
+    'create display message if user single click on a -00 code number\
+    On Error Resume Next
+    If Right(Target.Value, 1) = 0 Then
+        'doubleClickIndication_00
+        With Selection.Validation
+        .Delete
+        .Add Type:=xlValidateInputOnly, AlertStyle:=xlValidAlertStop, Operator _
+        :=xlBetween
+        .IgnoreBlank = True
+        .InCellDropdown = True
+        .InputTitle = "Double Click"
+        .inputmessage = "to generate AW Template A3 or A4 size"
+        .ShowInput = True
+        .ShowError = True
+        End With
+         
+    'create display message if user single click on a NON -00 code number
+    ElseIf Right(Target.Value, 1) <> 0 And Not IsEmpty(Target.Value) Then
+        'doubleClickIndication_Non_00
+        With Selection.Validation
+        .Delete
+        .Add Type:=xlValidateInputOnly, AlertStyle:=xlValidAlertStop, Operator _
+        :=xlBetween
+        .IgnoreBlank = True
+        .InCellDropdown = True
+        .InputTitle = "Double Click"
+        .inputmessage = "to generate ACN"
+        .ShowInput = True
+        .ShowError = True
+        End With
+    
+    ElseIf IsEmpty(Target.Value) Then
+    'do nothing
+    End If
+    
+    
+Next n
+
+End If
+'-----------
+
+
+End Sub
+
+'function for above to call when trying update code no cell in AWList to latest version number
+Public Function IsInArray(stringToBeFound As String, arr As Variant) As Boolean
+    Dim i
+    For i = LBound(arr) To UBound(arr)
+        If arr(i) = stringToBeFound Then
+            IsInArray = True
+            Exit Function
+        End If
+    Next i
+    IsInArray = False
+
+End Function
+
